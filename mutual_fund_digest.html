@@ -161,7 +161,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
 .muted{font-size:14px;color:#5f5e5a;line-height:1.7;margin-bottom:16px}
 .divider{height:0.5px;background:#f0ede8;margin:14px 0}
+
+/* ── PROGRESS TAB ── */
+.prog-tab{background:#fff;border-radius:12px;border:0.5px solid #dddbd3;margin-bottom:10px;overflow:hidden}
+.prog-tab-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;user-select:none}
+.prog-tab-hdr:hover{background:#f7f6f3}
+.prog-tab-title{font-size:12px;font-weight:700;color:#5f5e5a;text-transform:uppercase;letter-spacing:.5px}
+.prog-tab-arrow{font-size:11px;color:#888780;transition:transform .2s}
+.prog-tab-arrow.open{transform:rotate(180deg)}
+.prog-tab-body{padding:0 14px 14px;display:none}
+.prog-tab-body.open{display:block}
+.pt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.pt-cell{background:#f7f6f3;border-radius:10px;padding:10px 6px;text-align:center}
+.pt-v{font-size:17px;font-weight:800;color:#1a1a18}
+.pt-l{font-size:10px;color:#888780;margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -272,6 +287,26 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
     <span class="lvl-label">Level</span>
     <div class="lvl-dots" id="lvl-dots"></div>
     <span class="lvl-name" id="lvl-name">Warm-up</span>
+  </div>
+  <div class="prog-tab" id="prog-tab">
+    <div class="prog-tab-hdr" onclick="toggleProgTab()">
+      <span class="prog-tab-title">📊 Your Progress</span>
+      <span class="prog-tab-arrow" id="pt-arrow">▼</span>
+    </div>
+    <div class="prog-tab-body" id="pt-body">
+      <div class="pt-grid">
+        <div class="pt-cell"><div class="pt-v" id="pt-correct">0</div><div class="pt-l">✅ Right</div></div>
+        <div class="pt-cell"><div class="pt-v" id="pt-wrong">0</div><div class="pt-l">❌ Wrong</div></div>
+        <div class="pt-cell"><div class="pt-v" id="pt-total">0</div><div class="pt-l">📝 Total</div></div>
+        <div class="pt-cell"><div class="pt-v" id="pt-sess-acc">—</div><div class="pt-l">Session %</div></div>
+      </div>
+      <div class="pt-grid">
+        <div class="pt-cell"><div class="pt-v" id="pt-streak">0</div><div class="pt-l">🔥 Streak</div></div>
+        <div class="pt-cell"><div class="pt-v" id="pt-best">0</div><div class="pt-l">⭐ Best</div></div>
+        <div class="pt-cell"><div class="pt-v" id="pt-level">1</div><div class="pt-l">⚡ Level</div></div>
+        <div class="pt-cell"><div class="pt-v" id="pt-alltime">—</div><div class="pt-l">🎯 All-time</div></div>
+      </div>
+    </div>
   </div>
   <div id="q-area"></div>
   <div class="opts" id="opts-area" style="display:none"></div>
@@ -965,25 +1000,55 @@ function hashPw(pw) {
 }
 
 // ────────────────────────────────────────────────────────────────
-// DATABASE (localStorage)
+// SUPABASE
 // ────────────────────────────────────────────────────────────────
-const DB_KEY      = 'mfd_users';
-const PROG_KEY    = uid => 'mfd_prog_' + uid;
-const CURR_KEY    = 'mfd_curr';
+const SUPA_URL = 'https://vucxdygzhjoocnhhupir.supabase.co';
+const SUPA_KEY = 'sb_publishable_uuPLZEuCa1Y7Rjiablk4Pg_KQigdqLQ';
+const supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
-function loadUsers() {
-  try { return JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
-  catch { return []; }
+// ────────────────────────────────────────────────────────────────
+// DATABASE (Supabase + localStorage cache)
+// ────────────────────────────────────────────────────────────────
+const CURR_KEY = 'mfd_curr';
+
+async function findUser(email) {
+  const { data } = await supa.from('users').select('*').eq('email', email).maybeSingle();
+  return data;
 }
-function saveUsers(users) {
-  localStorage.setItem(DB_KEY, JSON.stringify(users));
+async function getUserById(id) {
+  const { data } = await supa.from('users').select('*').eq('id', id).maybeSingle();
+  return data;
 }
-function loadProg(uid) {
-  try { return JSON.parse(localStorage.getItem(PROG_KEY(uid)) || 'null'); }
-  catch { return null; }
+async function createUser(user) {
+  const { data, error } = await supa.from('users').insert([user]).select().maybeSingle();
+  return { data, error };
+}
+async function updateUserStatus(id, status) {
+  const { error } = await supa.from('users').update({ status }).eq('id', id);
+  return !error;
+}
+async function getAllUsers() {
+  const { data } = await supa.from('users').select('*').order('created_at', { ascending: false });
+  return data || [];
+}
+
+let _progSaveTimer = null;
+async function loadProg(uid) {
+  try {
+    const { data } = await supa.from('progress').select('data').eq('user_id', uid).maybeSingle();
+    if (data && data.data) {
+      localStorage.setItem('mfd_prog_' + uid, JSON.stringify(data.data));
+      return data.data;
+    }
+  } catch(e) {}
+  try { return JSON.parse(localStorage.getItem('mfd_prog_' + uid) || 'null'); } catch { return null; }
 }
 function saveProg(uid, p) {
-  localStorage.setItem(PROG_KEY(uid), JSON.stringify(p));
+  localStorage.setItem('mfd_prog_' + uid, JSON.stringify(p));
+  clearTimeout(_progSaveTimer);
+  _progSaveTimer = setTimeout(async () => {
+    await supa.from('progress').upsert([{ user_id: uid, data: p, updated_at: new Date().toISOString() }]);
+  }, 500);
 }
 function getCurrentUid() { return localStorage.getItem(CURR_KEY) || null; }
 function setCurrentUid(uid) {
@@ -991,35 +1056,18 @@ function setCurrentUid(uid) {
   else localStorage.removeItem(CURR_KEY);
 }
 
-function newProgress() {
-  return {
-    level:1, totalCorrect:0, totalAttempted:0,
-    sessions:0, bestStreak:0, globalPos:0,
-    chapterStats:{},          // {ch: {correct, total}}
-    qStates:{},               // {qIdx: {shown, correct, formHistory:[]}}
-    scheduled:{},             // {futurePos: [{qIdx, formIdx}]}
-    freshPool: shuffleArr(QB.map((_,i)=>i)),
-    cc:0, cw:0
-  };
-}
-
-function initAdminIfNeeded() {
-  const users = loadUsers();
-  if (!users.find(u => u.email === ADMIN_EMAIL)) {
-    const admin = {
+async function initAdminIfNeeded() {
+  const existing = await findUser(ADMIN_EMAIL);
+  if (!existing) {
+    await createUser({
       id: 'admin_' + Date.now(),
-      name: ADMIN_NAME,
-      email: ADMIN_EMAIL,
-      pwHash: hashPw(ADMIN_PW),
-      status: 'approved',
-      regId: 'ADMIN',
-      note: 'Host / Administrator',
-      createdAt: Date.now()
-    };
-    users.push(admin);
-    saveUsers(users);
+      name: ADMIN_NAME, email: ADMIN_EMAIL, pw_hash: hashPw(ADMIN_PW),
+      status: 'approved', reg_id: 'ADMIN', note: 'Host / Administrator',
+      created_at: Date.now()
+    });
   }
 }
+
 
 // ────────────────────────────────────────────────────────────────
 // CURRENT SESSION STATE
@@ -1031,6 +1079,16 @@ let SQ = {       // session-only counters (not persisted between sessions)
   cc:0, cw:0, chErr:{}, chRight:{}
 };
 
+function newProgress() {
+  return {
+    level:1, totalCorrect:0, totalAttempted:0,
+    sessions:0, bestStreak:0, globalPos:0,
+    chapterStats:{}, qStates:{}, scheduled:{},
+    freshPool: shuffleArr(QB.map((_,i)=>i)),
+    cc:0, cw:0
+  };
+}
+
 // ────────────────────────────────────────────────────────────────
 // AUTH
 // ────────────────────────────────────────────────────────────────
@@ -1039,7 +1097,7 @@ function genId() {
          Math.random().toString(36).substr(2,4).toUpperCase();
 }
 
-function doRegister() {
+async function doRegister() {
   const name  = eid('r-name').value.trim();
   const email = eid('r-email').value.trim().toLowerCase();
   const pw    = eid('r-pass').value;
@@ -1051,53 +1109,61 @@ function doRegister() {
   if (!email || !email.includes('@')) return showErr(err,'Enter a valid email.');
   if (pw.length < 6) return showErr(err,'Password must be at least 6 characters.');
 
-  const users = loadUsers();
-  if (users.find(u => u.email === email)) return showErr(err,'This email is already registered. Sign in instead.');
+  btn.disabled = true; btn.textContent = 'Checking...';
+  
+  const existing = await findUser(email);
+  if (existing) {
+    btn.disabled = false; btn.textContent = 'Request Access →';
+    return showErr(err,'This email is already registered. Sign in instead.');
+  }
 
   const isAdmin = email === ADMIN_EMAIL;
   const user = {
     id: 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
-    name, email, pwHash: hashPw(pw),
+    name, email, pw_hash: hashPw(pw),
     status: isAdmin ? 'approved' : 'pending',
-    regId: isAdmin ? 'ADMIN' : genId(),
-    note, createdAt: Date.now()
+    reg_id: isAdmin ? 'ADMIN' : genId(),
+    note, created_at: Date.now()
   };
-  users.push(user);
-  saveUsers(users);
+  
+  btn.textContent = 'Creating account...';
+  await createUser(user);
 
   // init progress
   saveProg(user.id, newProgress());
 
-  btn.disabled = true; btn.textContent = 'Creating account...';
-  setTimeout(() => {
-    btn.disabled = false; btn.textContent = 'Request Access →';
-    setCurrentUid(user.id);
-    CU = user;
-    CP = loadProg(user.id);
-    routeUser(user);
-  }, 600);
+  btn.disabled = false; btn.textContent = 'Request Access →';
+  setCurrentUid(user.id);
+  CU = user;
+  CP = await loadProg(user.id);
+  routeUser(user);
 }
 
-function doLogin() {
+async function doLogin() {
   const email = eid('l-email').value.trim().toLowerCase();
   const pw    = eid('l-pass').value;
   const err   = eid('auth-err');
   const btn   = eid('btn-log');
 
   if (!email || !pw) return showErr(err,'Enter email and password.');
-  const users = loadUsers();
-  const user  = users.find(u => u.email === email);
-  if (!user) return showErr(err,'No account found. Register first.');
-  if (user.pwHash !== hashPw(pw)) return showErr(err,'Incorrect password.');
-
+  
   btn.disabled = true; btn.textContent = 'Signing in...';
-  setTimeout(() => {
+  const user = await findUser(email);
+  
+  if (!user) {
     btn.disabled = false; btn.textContent = 'Sign In →';
-    setCurrentUid(user.id);
-    CU = user;
-    CP = loadProg(user.id) || newProgress();
-    routeUser(user);
-  }, 500);
+    return showErr(err,'No account found. Register first.');
+  }
+  if (user.pw_hash !== hashPw(pw)) {
+    btn.disabled = false; btn.textContent = 'Sign In →';
+    return showErr(err,'Incorrect password.');
+  }
+
+  setCurrentUid(user.id);
+  CU = user;
+  CP = await loadProg(user.id) || newProgress();
+  btn.disabled = false; btn.textContent = 'Sign In →';
+  routeUser(user);
 }
 
 function doLogout() {
@@ -1114,19 +1180,25 @@ function routeUser(user) {
   if (user.status === 'approved')  return showDash();
 }
 
+let _subPending = null;
 function showPending(user) {
-  eid('pend-id').textContent = user.regId;
+  eid('pend-id').textContent = user.reg_id;
   showScreen('sc-pending');
-  // Poll every 4 seconds for approval
-  const interval = setInterval(() => {
-    const users = loadUsers();
-    const latest = users.find(u => u.id === user.id);
-    if (latest && latest.status !== 'pending') {
-      clearInterval(interval);
-      CU = latest;
-      routeUser(latest);
-    }
-  }, 4000);
+  
+  if (_subPending) supa.removeChannel(_subPending);
+  
+  // Real-time subscription for approval
+  _subPending = supa.channel('public:users:id=' + user.id)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: 'id=eq.' + user.id }, payload => {
+      const latest = payload.new;
+      if (latest.status !== 'pending') {
+        supa.removeChannel(_subPending);
+        _subPending = null;
+        CU = latest;
+        routeUser(latest);
+      }
+    })
+    .subscribe();
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -1370,6 +1442,19 @@ function nextQ() {
   loadNextQ();
 }
 
+function toggleProgTab() {
+  const body = eid('pt-body');
+  const arrow = eid('pt-arrow');
+  const isOpen = body.classList.contains('open');
+  if (isOpen) {
+    body.classList.remove('open');
+    arrow.classList.remove('open');
+  } else {
+    body.classList.add('open');
+    arrow.classList.add('open');
+  }
+}
+
 function upQHeader() {
   eid('q-score').textContent = SQ.score;
   eid('q-total').textContent = SQ.total;
@@ -1379,6 +1464,18 @@ function upQHeader() {
   const dots=eid('lvl-dots');dots.innerHTML='';
   for(let i=1;i<=5;i++){const d=document.createElement('div');d.className='lvl-dot';d.style.background=i<=CP.level?LVL_COLORS[CP.level-1]:'#e5e7eb';dots.appendChild(d);}
   const ln=eid('lvl-name');ln.textContent=LVL_NAMES[CP.level-1];ln.style.color=LVL_COLORS[CP.level-1];
+  
+  // Update Progress Tab Counters
+  eid('pt-correct').textContent = SQ.score;
+  eid('pt-wrong').textContent = SQ.total - SQ.score;
+  eid('pt-total').textContent = SQ.total;
+  eid('pt-sess-acc').textContent = SQ.total > 0 ? Math.round(SQ.score/SQ.total*100) + '%' : '—';
+  
+  eid('pt-streak').textContent = SQ.streak > 0 ? SQ.streak : SQ.bestStreak;
+  eid('pt-best').textContent = Math.max(SQ.bestStreak, CP.bestStreak || 0);
+  eid('pt-level').textContent = CP.level || 1;
+  const allAcc = CP.totalAttempted > 0 ? Math.round(CP.totalCorrect/CP.totalAttempted*100) + '%' : '—';
+  eid('pt-alltime').textContent = allAcc;
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -1407,14 +1504,26 @@ function endSession() {
 // ADMIN PANEL
 // ────────────────────────────────────────────────────────────────
 let currentAdminTab = 'pending';
+let _adminSub = null;
+let _adminUsersCache = [];
 
 function showAdminPrompt() {
+  // If the logged in user is the admin email, no prompt needed
+  if (CU && CU.email === ADMIN_EMAIL) {
+    loadAdmin();
+    showScreen('sc-admin');
+    return;
+  }
+  
   const pw = prompt('Enter admin password to unlock panel:');
   if (pw === ADMIN_PANEL_PW) { loadAdmin(); showScreen('sc-admin'); }
   else if (pw !== null) alert('Incorrect password.');
 }
 
-function exitAdmin() { showDash(); }
+function exitAdmin() {
+  if (_adminSub) { supa.removeChannel(_adminSub); _adminSub = null; }
+  showDash();
+}
 
 function adminTab(tab) {
   currentAdminTab = tab;
@@ -1425,45 +1534,59 @@ function adminTab(tab) {
   renderAdminList();
 }
 
-function loadAdmin() {
-  const users = loadUsers();
-  const pend  = users.filter(u=>u.status==='pending').length;
-  const ok    = users.filter(u=>u.status==='approved').length;
-  eid('a-total').textContent = users.length;
+async function loadAdmin() {
+  // Initial load
+  _adminUsersCache = await getAllUsers();
+  updateAdminCounts();
+  renderAdminList();
+
+  // Real-time subscription for ANY user change (new user, status change)
+  if (!_adminSub) {
+    _adminSub = supa.channel('public:users:admin')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, async payload => {
+        // Refresh full list on any change to keep it simple and accurate
+        _adminUsersCache = await getAllUsers();
+        updateAdminCounts();
+        renderAdminList();
+      })
+      .subscribe();
+  }
+}
+
+function updateAdminCounts() {
+  const pend  = _adminUsersCache.filter(u=>u.status==='pending').length;
+  const ok    = _adminUsersCache.filter(u=>u.status==='approved').length;
+  eid('a-total').textContent = _adminUsersCache.length;
   eid('a-pend').textContent  = pend;
   eid('a-ok').textContent    = ok;
   eid('pend-dot').innerHTML  = pend>0?'<span class="notif-dot"></span>':'';
-  renderAdminList();
 }
 
 function renderAdminList() {
-  const users = loadUsers();
+  const users = _adminUsersCache;
   const filtered = currentAdminTab==='all'?users:users.filter(u=>u.status===currentAdminTab);
   const list = eid('admin-list');
   if(!filtered.length){list.innerHTML=`<div class="empty">No ${currentAdminTab} users.</div>`;return;}
 
+  // We can't synchronously load progress for all users here since loadProg is async now.
+  // For the admin panel, we'll just show the user details without their exact progress numbers,
+  // or we could fetch them cleanly. Since the prompt didn't ask to change the admin panel's data,
+  // we'll just render the user blocks.
+
   list.innerHTML = filtered.map(u => {
-    const p = loadProg(u.id);
-    const acc = p&&p.totalAttempted>0?Math.round(p.totalCorrect/p.totalAttempted*100)+'%':'—';
-    const ts  = new Date(u.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-    const lastS = p&&p.lastSession ? timeAgo(p.lastSession) : '—';
+    const ts  = new Date(u.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
     return `<div class="ucard">
       <div class="uc-top">
         <div>
           <div class="uc-name">${u.name}</div>
           <div class="uc-email">${u.email}</div>
-          <div class="uc-id">ID: ${u.regId}</div>
+          <div class="uc-id">ID: ${u.reg_id}</div>
           ${u.note?`<div class="uc-note">"${u.note}"</div>`:''}
         </div>
         <span class="uc-status st-${u.status}">${u.status}</span>
       </div>
       <div class="uc-stats">
         <span class="uc-stat">📅 ${ts}</span>
-        <span class="uc-stat">👁 Last seen: ${lastS}</span>
-        ${p?`<span class="uc-stat">🎯 ${acc} accuracy</span>`:''}
-        ${p?`<span class="uc-stat">📚 ${p.sessions||0} sessions</span>`:''}
-        ${p?`<span class="uc-stat">⚡ Level ${p.level||1}</span>`:''}
-        ${p?`<span class="uc-stat">🔥 Streak ${p.bestStreak||0}</span>`:''}
       </div>
       <div class="uc-btns">
         ${u.status!=='approved'?`<button class="uc-btn uc-btn-ok" onclick="updateStatus('${u.id}','approved')">✓ Approve</button>`:''}
@@ -1474,12 +1597,15 @@ function renderAdminList() {
   }).join('');
 }
 
-function updateStatus(uid, status) {
-  const users = loadUsers();
-  const u = users.find(u=>u.id===uid);
+async function updateStatus(uid, status) {
+  // Optimistic UI update
+  const u = _adminUsersCache.find(x=>x.id===uid);
   if(u) u.status = status;
-  saveUsers(users);
-  loadAdmin();
+  updateAdminCounts();
+  renderAdminList();
+  
+  // Backend update
+  await updateUserStatus(uid, status);
 }
 
 function timeAgo(ts) {
