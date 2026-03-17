@@ -18,8 +18,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nav-user{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1a1a18;cursor:pointer;padding:4px 8px;border-radius:8px;transition:background .2s}
 .nav-user:hover{background:#f0ede8}
 .nav-avatar{width:24px;height:24px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}
-.nav-btn-out{background:none;border:none;font-size:13px;font-weight:600;color:#888780;cursor:pointer;transition:color .2s}
-.nav-btn-out:hover{color:#dc2626}
+.nav-dropdown{position:absolute;top:48px;right:16px;background:#fff;border-radius:10px;border:1px solid #e5e7eb;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);min-width:140px;display:none;flex-direction:column;overflow:hidden;z-index:10000}
+.nav-dropdown.on{display:flex}
+.nav-drop-item{padding:10px 14px;font-size:13px;font-weight:600;color:#374151;cursor:pointer;background:none;border:none;text-align:left;width:100%;transition:background .2s}
+.nav-drop-item:hover{background:#f3f4f6}
+.nav-drop-item.danger{color:#dc2626}
+.nav-drop-item.danger:hover{background:#fee2e2}
+.nav-btn-out{display:none} /* removed old layout text btn */
 
 .wrap{width:100%;max-width:660px;margin-top:52px}
 .screen{display:none}.screen.on{display:block}
@@ -196,17 +201,22 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
 <!-- ═══ GLOBAL NAV ════════════════════════════════════════════════ -->
 <div class="global-nav" id="global-nav">
   <div class="nav-inner">
-    <div class="nav-l" onclick="showDash()">
+    <div class="nav-l" onclick="navToHome()">
       <span class="nav-l-icon">📘</span>
       <span class="nav-l-text">Home</span>
     </div>
     <div class="nav-r">
       <span class="badge-admin" id="nav-admin-btn" style="display:none" onclick="showAdminPrompt()">⚙ Admin</span>
-      <div class="nav-user" id="nav-user-dropdown">
+      <div class="nav-user" id="nav-user-dropdown" onclick="toggleNavDropdown()">
         <div class="nav-avatar" id="nav-avatar">U</div>
         <span id="nav-user-name">User</span>
       </div>
-      <button class="nav-btn-out" onclick="doLogout()">Logout</button>
+      
+      <!-- DROPDOWN -->
+      <div class="nav-dropdown" id="nav-dropdown-menu">
+        <button class="nav-drop-item" id="nav-drop-admin" style="display:none" onclick="toggleNavDropdown();showAdminPrompt()">⚙ Admin Panel</button>
+        <button class="nav-drop-item danger" onclick="toggleNavDropdown();doLogout()">Sign Out</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1172,6 +1182,25 @@ async function doRegister() {
   routeUser(user);
 }
 
+function toggleNavDropdown() {
+  eid('nav-dropdown-menu').classList.toggle('on');
+}
+
+// Close dropdown if clicked outside
+document.addEventListener('click', (e) => {
+  const d = eid('nav-dropdown-menu');
+  const t = eid('nav-user-dropdown');
+  if (d && t && d.classList.contains('on') && !d.contains(e.target) && !t.contains(e.target)) {
+    d.classList.remove('on');
+  }
+});
+
+function navToHome() {
+  // Gracefully handle leaving quiz
+  if (currentScreen === 'sc-quiz') endSession();
+  else showDash();
+}
+
 async function doLogin() {
   const email = eid('l-email').value.trim().toLowerCase();
   const pw    = eid('l-pass').value;
@@ -1214,7 +1243,9 @@ function updateNav(user) {
     nav.classList.add('on');
     eid('nav-user-name').textContent = user.name.split(' ')[0] || 'User';
     eid('nav-avatar').textContent = (user.name.charAt(0) || 'U').toUpperCase();
-    eid('nav-admin-btn').style.display = (user.email === ADMIN_EMAIL) ? 'inline-block' : 'none';
+    const isAdmin = (user.email === ADMIN_EMAIL);
+    eid('nav-admin-btn').style.display = 'none'; // hide inline button
+    eid('nav-drop-admin').style.display = isAdmin ? 'block' : 'none'; // show in dropdown
   } else {
     nav.classList.remove('on');
   }
@@ -1788,17 +1819,19 @@ const _loadNextQOrig = window.loadNextQ;
 // ────────────────────────────────────────────────────────────────
 // BOOT
 // ────────────────────────────────────────────────────────────────
-(function boot() {
+(async function boot() {
   initAdminIfNeeded();
   const uid = getCurrentUid();
   if (uid) {
-    const users = loadUsers();
-    const user  = users.find(u=>u.id===uid);
+    const user = await getUserById(uid);
     if (user) {
       CU = user;
-      CP = loadProg(uid) || newProgress();
+      CP = await loadProg(uid) || newProgress();
       routeUser(user);
       return;
+    } else {
+      // invalid or deleted uid
+      setCurrentUid(null);
     }
   }
   showScreen('sc-auth');
