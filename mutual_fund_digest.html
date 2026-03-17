@@ -333,14 +333,13 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
   </div>
 </div>
 
-<!-- ═══ ADMIN SCREEN REMOVED ═════════════════════════════════════════════ -->
+  <!-- ═══ ADMIN SCREEN REMOVED ═════════════════════════════════════════════ -->
 
+  <div style="text-align: right; padding-top: 12px; font-size: 11.5px; color: #888780; font-weight: 600; letter-spacing: 0.3px;">
+    A Project by Prateek Reengusia
+  </div>
 </div><!-- end .wrap -->
 <div class="cf-wrap" id="cf-wrap"></div>
-
-<div style="position:fixed;bottom:10px;right:16px;font-size:11px;color:#888780;z-index:9999;font-weight:600;letter-spacing:0.3px;">
-  A Project by Prateek Reengusia
-</div>
 
 <!-- ═══════════════════════════════════════════════════════════════
      COMPLETE APPLICATION LOGIC
@@ -1104,7 +1103,7 @@ function showDash() {
   eid('d-name').textContent = firstName;
 
   const daysSince = p.lastSession ? Math.floor((Date.now()-p.lastSession)/86400000) : -1;
-  let greet = 'Welcome to Mutual Fund — Digest 📘';
+  let greet = 'Welcome to Mutual Fund - Digest 📘';
   if (p.sessions > 0 && daysSince === 0) greet = 'Great to see you again today! 💪';
   else if (p.sessions > 0 && daysSince === 1) greet = 'Back after yesterday — keep it up! 🔥';
   else if (p.sessions > 0 && daysSince > 1)  greet = `Welcome back! You were last here ${daysSince} days ago.`;
@@ -1136,8 +1135,6 @@ function showDash() {
     eid('ch-bars').innerHTML = rows.join('');
   }
 
-  // Admin button
-  eid('admin-btn').style.display = CU.email === ADMIN_EMAIL ? 'inline' : 'none';
   showScreen('sc-dash');
 }
 
