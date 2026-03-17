@@ -7,7 +7,21 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0ede8;min-height:100vh;display:flex;justify-content:center;padding:20px 16px}
-.wrap{width:100%;max-width:660px}
+/* ── GLOBAL NAV ── */
+.global-nav{position:fixed;top:0;left:0;width:100%;background:#ffffffcc;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:0.5px solid #dddbd3;z-index:9999;transition:transform .3s;transform:translateY(-100%)}
+.global-nav.on{transform:translateY(0)}
+.nav-inner{max-width:660px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:52px;padding:0 16px}
+.nav-l{display:flex;align-items:center;cursor:pointer;user-select:none}
+.nav-l-icon{font-size:18px;margin-right:6px}
+.nav-l-text{font-size:14px;font-weight:800;color:#1a1a18;letter-spacing:-.3px}
+.nav-r{display:flex;align-items:center;gap:12px}
+.nav-user{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1a1a18;cursor:pointer;padding:4px 8px;border-radius:8px;transition:background .2s}
+.nav-user:hover{background:#f0ede8}
+.nav-avatar{width:24px;height:24px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}
+.nav-btn-out{background:none;border:none;font-size:13px;font-weight:600;color:#888780;cursor:pointer;transition:color .2s}
+.nav-btn-out:hover{color:#dc2626}
+
+.wrap{width:100%;max-width:660px;margin-top:52px}
 .screen{display:none}.screen.on{display:block}
 
 /* ── CARD ── */
@@ -179,6 +193,24 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
+<!-- ═══ GLOBAL NAV ════════════════════════════════════════════════ -->
+<div class="global-nav" id="global-nav">
+  <div class="nav-inner">
+    <div class="nav-l" onclick="showDash()">
+      <span class="nav-l-icon">📘</span>
+      <span class="nav-l-text">Home</span>
+    </div>
+    <div class="nav-r">
+      <span class="badge-admin" id="nav-admin-btn" style="display:none" onclick="showAdminPrompt()">⚙ Admin</span>
+      <div class="nav-user" id="nav-user-dropdown">
+        <div class="nav-avatar" id="nav-avatar">U</div>
+        <span id="nav-user-name">User</span>
+      </div>
+      <button class="nav-btn-out" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+</div>
+
 <div class="wrap">
 
 <!-- ═══ AUTH SCREEN ════════════════════════════════════════════════ -->
@@ -252,7 +284,6 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
         <div class="dash-name">👋 <span id="d-name">there</span></div>
         <div class="dash-greet" id="d-greet">Welcome to Mutual Fund — Digest</div>
       </div>
-      <span class="badge-admin" id="admin-btn" style="display:none" onclick="showAdminPrompt()">⚙ Admin</span>
     </div>
     <div class="stat-grid">
       <div class="stat-cell"><div class="stat-v" id="d-acc">—</div><div class="stat-l">Accuracy</div></div>
@@ -265,7 +296,6 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
       <div id="ch-bars"></div>
     </div>
     <button class="btn btn-blue" onclick="startSession()">Continue Learning →</button>
-    <button class="btn btn-out" onclick="doLogout()" style="margin-top:8px">Sign out</button>
   </div>
 </div>
 
@@ -366,8 +396,8 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
 // ────────────────────────────────────────────────────────────────
 const ADMIN_EMAIL = "prateekringusia@gmail.com";
 const ADMIN_NAME  = "Prateek Reengusia";
-const ADMIN_PW    = "Prateek@1234";
-const ADMIN_PANEL_PW = "Prateek@1234";
+const ADMIN_PW    = "Prateek@1212";
+const ADMIN_PANEL_PW = "Prateek@1212";
 const MAX_Q_PER_SESSION = 30;
 
 const CH_NAMES = ['Investment Landscape','Concept & Role of MF','Legal Structure','MF Products',
@@ -1168,13 +1198,27 @@ async function doLogin() {
 
 function doLogout() {
   setCurrentUid(null); CU = null; CP = null;
+  updateNav(null);
   showScreen('sc-auth');
   eid('l-email').value = ''; eid('l-pass').value = '';
   eid('btn-log').disabled = false; eid('btn-log').textContent = 'Sign In →';
   hideErr(eid('auth-err'));
 }
 
+function updateNav(user) {
+  const nav = eid('global-nav');
+  if (user && user.status === 'approved') {
+    nav.classList.add('on');
+    eid('nav-user-name').textContent = user.name.split(' ')[0] || 'User';
+    eid('nav-avatar').textContent = (user.name.charAt(0) || 'U').toUpperCase();
+    eid('nav-admin-btn').style.display = (user.email === ADMIN_EMAIL) ? 'inline-block' : 'none';
+  } else {
+    nav.classList.remove('on');
+  }
+}
+
 function routeUser(user) {
+  updateNav(user);
   if (user.status === 'pending')   return showPending(user);
   if (user.status === 'rejected')  return showScreen('sc-rejected');
   if (user.status === 'approved')  return showDash();
