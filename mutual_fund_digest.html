@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mutual Fund — Digest</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0ede8;min-height:100vh;display:flex;justify-content:center;padding:20px 16px}
+.wrap{width:100%;max-width:660px}
+.screen{display:none}.screen.on{display:block}
+
+/* ── CARD ── */
+.card{background:#fff;border-radius:18px;border:0.5px solid #dddbd3;padding:32px 28px;margin-bottom:12px}
+.card-sm{background:#fff;border-radius:14px;border:0.5px solid #dddbd3;padding:20px 22px;margin-bottom:10px}
+
+/* ── AUTH ── */
+.logo{text-align:center;margin-bottom:24px}
+.logo-mark{font-size:38px;margin-bottom:6px}
+.logo-title{font-size:22px;font-weight:800;color:#1a1a18;letter-spacing:-.5px}
+.logo-sub{font-size:12px;color:#888780;margin-top:2px;letter-spacing:.5px;text-transform:uppercase}
+.tabs{display:flex;background:#f0ede8;border-radius:10px;padding:3px;margin-bottom:22px}
+.tab{flex:1;padding:9px;border:none;background:none;border-radius:8px;font-size:14px;font-weight:500;color:#888780;cursor:pointer;transition:all .2s}
+.tab.on{background:#fff;color:#1a1a18;box-shadow:0 1px 4px rgba(0,0,0,.09)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;color:#888780;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.field input{width:100%;border:0.5px solid #d3d1c7;border-radius:10px;padding:11px 14px;font-size:14px;color:#1a1a18;outline:none;transition:border .15s;background:#fff}
+.field input:focus{border-color:#2563eb}
+.field input::placeholder{color:#b4b2a9}
+.btn{width:100%;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:2px}
+.btn-blue{background:#2563eb;color:#fff}.btn-blue:hover{background:#1d4ed8}
+.btn-blue:disabled{background:#93c5fd;cursor:not-allowed}
+.btn-out{background:#fff;border:0.5px solid #d3d1c7;color:#1a1a18}.btn-out:hover{border-color:#2563eb;color:#2563eb}
+.err{background:#fef2f2;color:#7f1d1d;border:0.5px solid #fca5a5;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px;display:none}
+.err.on{display:block}
+.switch-note{text-align:center;font-size:13px;color:#888780;margin-top:14px}
+.switch-note a{color:#2563eb;cursor:pointer;font-weight:500}
+
+/* ── PENDING ── */
+.status-wrap{text-align:center;padding:8px 0}
+.big-icon{font-size:54px;margin-bottom:14px;display:block}
+.status-title{font-size:20px;font-weight:800;color:#1a1a18;margin-bottom:8px}
+.status-body{font-size:14px;color:#5f5e5a;line-height:1.7;margin-bottom:20px}
+.id-box{background:#f0ede8;border-radius:10px;padding:12px 16px;margin:10px 0 18px;text-align:center}
+.id-label{font-size:11px;color:#888780;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.id-value{font-size:18px;font-weight:800;color:#2563eb;letter-spacing:2px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.pulsing{animation:pulse 2.2s ease-in-out infinite}
+
+/* ── DASHBOARD ── */
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.dash-name{font-size:20px;font-weight:800;color:#1a1a18}
+.dash-greet{font-size:13px;color:#888780;margin-bottom:18px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.stat-cell{background:#f7f6f3;border-radius:12px;padding:14px;text-align:center}
+.stat-v{font-size:26px;font-weight:800;color:#1a1a18}
+.stat-l{font-size:11px;color:#888780;margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+.ch-section{margin-bottom:18px}
+.ch-title{font-size:12px;font-weight:700;color:#888780;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.ch-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12px;color:#5f5e5a}
+.ch-name{min-width:130px;font-size:12px}
+.ch-bar-bg{flex:1;background:#f0ede8;border-radius:3px;height:6px;overflow:hidden}
+.ch-bar{height:100%;border-radius:3px;transition:width .5s}
+.ch-pct{min-width:30px;text-align:right;font-size:11px;font-weight:600}
+.badge-admin{background:#ede9fe;color:#4c1d95;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer}
+.badge-admin:hover{background:#ddd6fe}
+
+/* ── QUIZ HEADER ── */
+.qhdr{background:#fff;border-radius:14px;border:0.5px solid #dddbd3;padding:13px 18px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.qhdr-l .app-name{font-size:13px;font-weight:800;color:#1a1a18;letter-spacing:-.3px}
+.qhdr-l .q-chapter{font-size:11px;color:#888780;margin-top:1px}
+.qhdr-r{display:flex;gap:11px;align-items:center}
+.mini-stat{text-align:center}
+.mini-v{font-size:17px;font-weight:800;color:#1a1a18}
+.mini-l{font-size:9px;color:#888780;text-transform:uppercase;letter-spacing:.4px}
+.streak-pill{background:#fef3c7;color:#92400e;border-radius:20px;padding:4px 9px;font-size:12px;font-weight:700}
+.prog-bg{background:#f0ede8;border-radius:4px;height:5px;margin-bottom:10px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#2563eb,#059669);border-radius:4px;transition:width .4s}
+.lvl-row{background:#fff;border-radius:10px;border:0.5px solid #dddbd3;padding:10px 16px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.lvl-label{font-size:11px;color:#888780;white-space:nowrap}
+.lvl-dots{display:flex;gap:5px;flex:1}
+.lvl-dot{flex:1;height:7px;border-radius:4px;transition:background .4s}
+.lvl-name{font-size:11px;font-weight:700;white-space:nowrap;transition:color .4s}
+
+/* ── QUESTION ── */
+.q-card{background:#fff;border-radius:14px;border:0.5px solid #dddbd3;padding:24px;margin-bottom:10px}
+.q-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+.pill{padding:2px 8px;border-radius:5px;font-size:11px;font-weight:700}
+.pill-ch{background:#dbeafe;color:#1e40af}
+.pill-d1{background:#dcfce7;color:#14532d}
+.pill-d2{background:#dbeafe;color:#1e40af}
+.pill-d3{background:#fef9c3;color:#713f12}
+.pill-d4{background:#fee2e2;color:#7f1d1d}
+.pill-d5{background:#ede9fe;color:#4c1d95}
+.pill-rev{background:#fef3c7;color:#92400e}
+.pill-var{background:#ede9fe;color:#4c1d95}
+.q-num{font-size:11px;color:#b4b2a9;margin-left:auto}
+.q-text{font-size:15px;color:#1a1a18;line-height:1.65;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
+.opt{background:#fff;border:0.5px solid #d3d1c7;border-radius:11px;padding:13px 16px;font-size:14px;color:#1a1a18;cursor:pointer;text-align:left;display:flex;align-items:flex-start;gap:10px;transition:border-color .15s,background .15s;line-height:1.5}
+.opt:hover:not(:disabled){border-color:#2563eb;background:#eff6ff}
+.opt:disabled{cursor:default}
+.opt.correct{border-color:#16a34a!important;background:#f0fdf4!important;color:#14532d;font-weight:500}
+.opt.wrong{border-color:#dc2626!important;background:#fef2f2!important;color:#7f1d1d}
+.opt.show-ans{border-color:#16a34a!important;background:#f7fef7!important;color:#15803d}
+.opt-letter{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;border-radius:50%;background:#f0ede8;color:#5f5e5a;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;transition:all .2s}
+.opt.correct .opt-letter{background:#16a34a;color:#fff}
+.opt.wrong .opt-letter{background:#dc2626;color:#fff}
+.opt.show-ans .opt-letter{background:#86efac;color:#14532d}
+.exp-box{border-radius:11px;padding:15px 17px;margin-bottom:10px;font-size:13.5px;line-height:1.75;display:none}
+.exp-box.ok{background:#f0fdf4;border:0.5px solid #86efac;color:#14532d}
+.exp-box.no{background:#fef2f2;border:0.5px solid #fca5a5;color:#7f1d1d}
+.exp-head{font-weight:800;font-size:13px;margin-bottom:5px}
+.nxt-btn{width:100%;background:#2563eb;color:#fff;border:none;border-radius:11px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;display:none;transition:background .15s;margin-bottom:4px}
+.nxt-btn:hover{background:#1d4ed8}
+
+/* ── SESSION END ── */
+.big-score{font-size:56px;font-weight:900;color:#2563eb;text-align:center;margin:8px 0 4px}
+.score-pct{font-size:18px;font-weight:700;text-align:center;margin-bottom:14px}
+.end-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.end-cell{background:#f7f6f3;border-radius:11px;padding:13px;text-align:center}
+.end-cv{font-size:22px;font-weight:800;color:#1a1a18}
+.end-cl{font-size:11px;color:#888780;margin-top:2px}
+.weak-note{background:#fef2f2;border-radius:10px;padding:13px 16px;font-size:13px;color:#7f1d1d;margin-bottom:12px;display:none}
+
+/* ── ADMIN ── */
+.admin-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.admin-title{font-size:18px;font-weight:800;color:#1a1a18}
+.admin-tabs{display:flex;gap:6px;margin-bottom:14px}
+.atab{padding:7px 14px;border:0.5px solid #d3d1c7;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;background:#fff;transition:all .15s}
+.atab.on{background:#2563eb;color:#fff;border-color:#2563eb}
+.admin-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px}
+.asum-cell{background:#fff;border-radius:10px;border:0.5px solid #dddbd3;padding:13px;text-align:center}
+.asum-v{font-size:22px;font-weight:800;color:#2563eb}
+.asum-l{font-size:11px;color:#888780;margin-top:2px}
+.ucard{background:#fff;border-radius:12px;border:0.5px solid #dddbd3;padding:14px 16px;margin-bottom:9px}
+.uc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.uc-name{font-size:14px;font-weight:700;color:#1a1a18}
+.uc-email{font-size:12px;color:#888780}
+.uc-id{font-size:11px;color:#b4b2a9;margin-top:2px}
+.uc-note{font-size:12px;color:#888780;margin-top:3px;font-style:italic}
+.uc-status{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.st-pending{background:#fef3c7;color:#92400e}
+.st-approved{background:#dcfce7;color:#14532d}
+.st-rejected{background:#fee2e2;color:#7f1d1d}
+.uc-stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.uc-stat{font-size:12px;color:#5f5e5a;background:#f7f6f3;padding:3px 8px;border-radius:5px}
+.uc-btns{display:flex;gap:7px}
+.uc-btn{border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;border:0.5px solid;transition:all .15s}
+.uc-btn-ok{background:#f0fdf4;color:#14532d;border-color:#86efac}.uc-btn-ok:hover{background:#dcfce7}
+.uc-btn-no{background:#fef2f2;color:#7f1d1d;border-color:#fca5a5}.uc-btn-no:hover{background:#fee2e2}
+.uc-btn-rev{background:#f7f6f3;color:#5f5e5a;border-color:#d3d1c7}.uc-btn-rev:hover{background:#f0ede8}
+.notif-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#dc2626;margin-left:4px;vertical-align:middle}
+.empty{text-align:center;padding:28px;color:#888780;font-size:14px}
+
+/* ── CONFETTI ── */
+.cf-wrap{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden}
+.cp{position:absolute;width:9px;height:9px;border-radius:2px;animation:cffall 1.7s ease-in forwards}
+@keyframes cffall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
+.muted{font-size:14px;color:#5f5e5a;line-height:1.7;margin-bottom:16px}
+.divider{height:0.5px;background:#f0ede8;margin:14px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ═══ AUTH SCREEN ════════════════════════════════════════════════ -->
+<div id="sc-auth" class="screen on">
+  <div class="card">
+    <div class="logo">
+      <div class="logo-mark">📘</div>
+      <div class="logo-title">Mutual Fund — Digest</div>
+      <div class="logo-sub">Adaptive Learning Platform</div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" id="tab-reg" onclick="switchTab('reg')">Create Account</button>
+      <button class="tab" id="tab-log" onclick="switchTab('log')">Sign In</button>
+    </div>
+    <div class="err on" id="auth-err" style="display:none"></div>
+
+    <div id="form-reg">
+      <div class="field"><label>Full Name</label><input id="r-name" type="text" placeholder="Your full name"></div>
+      <div class="field"><label>Email</label><input id="r-email" type="email" placeholder="you@email.com"></div>
+      <div class="field"><label>Password</label><input id="r-pass" type="password" placeholder="Min 6 characters"></div>
+      <div class="field"><label>Why do you want access? <span style="font-weight:400;color:#b4b2a9">(optional)</span></label>
+        <input id="r-note" type="text" placeholder="e.g. Preparing for NISM exam"></div>
+      <button class="btn btn-blue" id="btn-reg" onclick="doRegister()">Request Access →</button>
+      <div class="switch-note">Already have an account? <a onclick="switchTab('log')">Sign in</a></div>
+    </div>
+
+    <div id="form-log" style="display:none">
+      <div class="field"><label>Email</label><input id="l-email" type="email" placeholder="you@email.com"></div>
+      <div class="field"><label>Password</label><input id="l-pass" type="password" placeholder="Your password"></div>
+      <button class="btn btn-blue" id="btn-log" onclick="doLogin()">Sign In →</button>
+      <div class="switch-note">New here? <a onclick="switchTab('reg')">Create account</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PENDING SCREEN ════════════════════════════════════════════ -->
+<div id="sc-pending" class="screen">
+  <div class="card">
+    <div class="status-wrap">
+      <span class="big-icon pulsing">⏳</span>
+      <div class="status-title">Waiting for Approval</div>
+      <div class="status-body">Your registration has been received. The host will review and approve your access. This page updates automatically — no need to refresh.</div>
+      <div class="id-box">
+        <div class="id-label">Your Registration ID</div>
+        <div class="id-value" id="pend-id">—</div>
+      </div>
+      <div style="font-size:12px;color:#888780;margin-bottom:18px">Share this ID with the host to speed up approval.</div>
+      <div class="divider"></div>
+      <button class="btn btn-out" onclick="doLogout()" style="margin-top:10px">← Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REJECTED SCREEN ══════════════════════════════════════════ -->
+<div id="sc-rejected" class="screen">
+  <div class="card">
+    <div class="status-wrap">
+      <span class="big-icon">🚫</span>
+      <div class="status-title">Access Not Granted</div>
+      <div class="status-body">Your access request was reviewed and not approved by the host.</div>
+      <button class="btn btn-out" onclick="doLogout()" style="margin-top:10px">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ════════════════════════════════════════════════ -->
+<div id="sc-dash" class="screen">
+  <div class="card">
+    <div class="dash-header">
+      <div>
+        <div class="dash-name">👋 <span id="d-name">there</span></div>
+        <div class="dash-greet" id="d-greet">Welcome to Mutual Fund — Digest</div>
+      </div>
+      <span class="badge-admin" id="admin-btn" style="display:none" onclick="showAdminPrompt()">⚙ Admin</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="stat-v" id="d-acc">—</div><div class="stat-l">Accuracy</div></div>
+      <div class="stat-cell"><div class="stat-v" id="d-lvl">1</div><div class="stat-l">Level</div></div>
+      <div class="stat-cell"><div class="stat-v" id="d-streak">0</div><div class="stat-l">Best Streak</div></div>
+      <div class="stat-cell"><div class="stat-v" id="d-sessions">0</div><div class="stat-l">Sessions</div></div>
+    </div>
+    <div class="ch-section" id="ch-bars-section" style="display:none">
+      <div class="ch-title">Chapter Accuracy</div>
+      <div id="ch-bars"></div>
+    </div>
+    <button class="btn btn-blue" onclick="startSession()">Continue Learning →</button>
+    <button class="btn btn-out" onclick="doLogout()" style="margin-top:8px">Sign out</button>
+  </div>
+</div>
+
+<!-- ═══ QUIZ SCREEN ══════════════════════════════════════════════ -->
+<div id="sc-quiz" class="screen">
+  <div class="qhdr">
+    <div class="qhdr-l">
+      <div class="app-name">Mutual Fund — Digest</div>
+      <div class="q-chapter" id="q-ch-name">Chapter</div>
+    </div>
+    <div class="qhdr-r">
+      <div class="mini-stat"><div class="mini-v" id="q-score">0</div><div class="mini-l">Score</div></div>
+      <div class="mini-stat"><div class="mini-v" id="q-total">0</div><div class="mini-l">Total</div></div>
+      <div class="mini-stat"><div class="streak-pill" id="q-streak">🔥 0</div><div class="mini-l" style="text-align:center;margin-top:2px">Streak</div></div>
+    </div>
+  </div>
+  <div class="prog-bg"><div class="prog-fill" id="q-prog" style="width:0%"></div></div>
+  <div class="lvl-row">
+    <span class="lvl-label">Level</span>
+    <div class="lvl-dots" id="lvl-dots"></div>
+    <span class="lvl-name" id="lvl-name">Warm-up</span>
+  </div>
+  <div id="q-area"></div>
+  <div class="opts" id="opts-area" style="display:none"></div>
+  <div class="exp-box" id="exp-box"></div>
+  <button class="nxt-btn" id="nxt-btn" onclick="nextQ()">Next Question →</button>
+</div>
+
+<!-- ═══ SESSION END ══════════════════════════════════════════════ -->
+<div id="sc-end" class="screen">
+  <div class="card">
+    <div style="font-size:38px;text-align:center;margin-bottom:6px">🎓</div>
+    <h2 style="text-align:center">Session Complete!</h2>
+    <div class="big-score" id="e-score">0/30</div>
+    <div class="score-pct" id="e-pct"></div>
+    <div class="end-grid">
+      <div class="end-cell"><div class="end-cv" id="e-level">1</div><div class="end-cl">Level Reached</div></div>
+      <div class="end-cell"><div class="end-cv" id="e-streak">0</div><div class="end-cl">Best Streak</div></div>
+      <div class="end-cell"><div class="end-cv" id="e-all">0%</div><div class="end-cl">All-time Acc.</div></div>
+      <div class="end-cell"><div class="end-cv" id="e-sessions">1</div><div class="end-cl">Sessions Done</div></div>
+    </div>
+    <div class="weak-note" id="weak-note"><strong>📌 Review next time:</strong> <span id="weak-list"></span></div>
+    <button class="btn btn-blue" onclick="startSession()">New Session →</button>
+    <button class="btn btn-out" onclick="showDash()" style="margin-top:8px">Back to Home</button>
+  </div>
+</div>
+
+<!-- ═══ ADMIN SCREEN ═════════════════════════════════════════════ -->
+<div id="sc-admin" class="screen">
+  <div class="card">
+    <div class="admin-top">
+      <div class="admin-title">🛡️ Admin Panel</div>
+      <button class="btn btn-out" style="width:auto;padding:7px 14px;font-size:13px" onclick="exitAdmin()">← Back</button>
+    </div>
+    <div class="admin-sum">
+      <div class="asum-cell"><div class="asum-v" id="a-total">0</div><div class="asum-l">Total Users</div></div>
+      <div class="asum-cell"><div class="asum-v" id="a-pend" style="color:#92400e">0</div><div class="asum-l">Pending</div></div>
+      <div class="asum-cell"><div class="asum-v" id="a-ok" style="color:#14532d">0</div><div class="asum-l">Approved</div></div>
+    </div>
+    <div class="admin-tabs">
+      <button class="atab on" id="at-pend" onclick="adminTab('pending')">Pending <span id="pend-dot"></span></button>
+      <button class="atab" id="at-ok" onclick="adminTab('approved')">Approved</button>
+      <button class="atab" id="at-all" onclick="adminTab('all')">All</button>
+    </div>
+    <div id="admin-list"></div>
+  </div>
+</div>
+
+</div><!-- end .wrap -->
+<div class="cf-wrap" id="cf-wrap"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     COMPLETE APPLICATION LOGIC
+═══════════════════════════════════════════════════════════════ -->
+<script>
+// ────────────────────────────────────────────────────────────────
+// CONSTANTS
+// ────────────────────────────────────────────────────────────────
+const ADMIN_EMAIL = "prateekringusia@gmail.com";
+const ADMIN_NAME  = "Prateek Reengusia";
+const ADMIN_PW    = "Prateek@1234";
+const ADMIN_PANEL_PW = "Prateek@1234";
+const MAX_Q_PER_SESSION = 30;
+
+const CH_NAMES = ['Investment Landscape','Concept & Role of MF','Legal Structure','MF Products',
+                  'Scheme Related Info','Fund Distribution','MF Performance','Taxation',
+                  'Investor Services','Legal & Regulatory'];
+const LVL_COLORS  = ['#6b7280','#2563eb','#059669','#d97706','#7c3aed'];
+const LVL_NAMES   = ['Warm-up 😊','Getting There 🧩','On a Roll 🔥','Sharp! ⚡','Expert 🏆'];
+const DIFF_CLASS  = ['','pill-d1','pill-d2','pill-d3','pill-d4','pill-d5'];
+const DIFF_LABEL  = ['','Easy','Medium-Easy','Medium','Hard','Expert'];
+const CH_WEIGHT   = [6,12,8,6,12,10,12,6,20,8];
+
+// Minimum question gap before a revisit can appear
+const REVISIT_GAP_WRONG   = [12, 18]; // [min, max] questions later
+const REVISIT_GAP_CORRECT = [22, 30]; // first correct → revisit
+
+// ────────────────────────────────────────────────────────────────
+// QUESTION BANK
+// Each question has:
+//   ch(apter), d(ifficulty 1-5), topic, exp(lanation)
+//   forms: array of {q, o[], a} - each form tests same concept differently
+//     form 0: original direct question
+//     form 1: rephrased / negative / indirect angle
+//     form 2: scenario / example / calculation based
+// ────────────────────────────────────────────────────────────────
+const QB = [
+// ── CH1: INVESTMENT LANDSCAPE ──────────────────────────────────
+{ch:1,d:1,topic:"Saving vs Investing",
+exp:"Saving and investing are two steps of the same process. You must save first (set aside money safely), then invest that saved money to earn returns. Saving = safety priority. Investing = returns priority. You cannot invest what you haven't first saved.",
+forms:[
+  {q:"Which best describes the relationship between saving and investing?",
+   o:["They are the same — both keep money safe","Investing comes first, then saving","Saving comes first — then invest those savings","They are completely unrelated activities"],a:2},
+  {q:"You CANNOT invest money without first ________ it.",
+   o:["Depositing in a fixed account","Spending on essentials","Saving it","Registering with SEBI"],a:2},
+  {q:"Ramesh earns ₹50,000/month, spends ₹38,000 and puts the remaining ₹12,000 in a PPF. This is an example of ________.",
+   o:["Investing before saving","Saving that then becomes investment","Spending as a form of investment","Neither saving nor investing"],a:1}
+]},
+
+{ch:1,d:1,topic:"Safe Haven Asset",
+exp:"Gold is the global safe haven asset. When currencies fail or economies crash, investors flee to gold because it is universally accepted and its price is globally synced. Central banks worldwide hold gold reserves. Fixed deposits are domestically safe but not a global safe haven.",
+forms:[
+  {q:"Which asset class is traditionally called the 'safe haven' when economies or currencies fail?",
+   o:["Real estate","Equity shares","Gold","Fixed deposits"],a:2},
+  {q:"Central banks worldwide hold ________ in their reserves as the ultimate store of value.",
+   o:["Foreign bonds","Equity indexes","Gold","Fixed deposits"],a:2},
+  {q:"During a global financial crisis where the rupee collapses, which asset is MOST likely to preserve value internationally?",
+   o:["Indian FD","LIC policy","Gold","Real estate"],a:2}
+]},
+
+{ch:1,d:1,topic:"Bond Investor Type",
+exp:"A bond investor is a LENDER — they lend money to the issuer who promises to repay the principal and pay regular interest. Unlike equity (where you own a share of the company and share in profits and losses), bond returns are mostly pre-agreed. This makes bonds generally safer but with lower return potential.",
+forms:[
+  {q:"Someone who buys a government bond is best described as a ________.",
+   o:["Part-owner of the government","Shareholder","Lender of money","Day trader"],a:2},
+  {q:"The PRIMARY difference between an equity investor and a bond investor is that the equity investor is an OWNER while the bond investor is a ________.",
+   o:["Regulator","Lender","Speculator","Depositor"],a:1},
+  {q:"Priya buys a 10-year ₹1 lakh government bond paying 7% p.a. interest. In this transaction, Priya is acting as a ________.",
+   o:["Owner of the government's assets","Shareholder in a public enterprise","Lender who will receive fixed interest","Business partner of the government"],a:2}
+]},
+
+{ch:1,d:2,topic:"Exit Charges vs Liquidity",
+exp:"Exit charges reduce RETURNS but do NOT reduce liquidity. Liquidity means the ability to ACCESS your money. An exit charge doesn't block access — you can still get your money out. It just reduces the amount you receive. True illiquidity means you CANNOT access your money at all (e.g. a 5-year FD with no premature withdrawal option).",
+forms:[
+  {q:"Exit charges on an investment product ________.",
+   o:["Reduce both liquidity and returns","Reduce returns but do NOT affect liquidity","Reduce liquidity but do NOT affect returns","Have no impact on either"],a:1},
+  {q:"A mutual fund has a 1% exit load for redemption within 1 year. The investor's LIQUIDITY is ________.",
+   o:["Completely eliminated","Slightly reduced","Not affected — they can still exit any time","Affected only after 6 months"],a:2},
+  {q:"Fund A: 0% exit load. Fund B: 2% exit load if exited within 2 years. Both funds hold similar assets. Compared to Fund A, Fund B ________.",
+   o:["Has lower liquidity because of the exit load","Has the same liquidity but exit has a higher cost","Has better liquidity because of the holding incentive","Has lower risk due to the lock-in effect"],a:1}
+]},
+
+{ch:1,d:2,topic:"Asset Class - No Current Income",
+exp:"Commodities (like gold and silver) generate ZERO current income — no rent, no interest, no dividends. The only return possible is capital appreciation (price increase when sold). Bonds generate interest, real estate generates rent, equity can pay dividends. This no-income property of commodities is a frequently tested distinction.",
+forms:[
+  {q:"Which asset class generates NO current income (no rent, interest, or dividends)?",
+   o:["Fixed income (bonds)","Real estate","Commodities (gold/silver)","Equity (shares)"],a:2},
+  {q:"An investor who holds only gold coins will earn income in which form?",
+   o:["Regular interest every year","Annual dividend from the government","Only capital appreciation when gold is sold","Rental income from gold storage"],a:2},
+  {q:"Aarav holds shares (pays dividends), an apartment (generating rent), a bond (paying interest) and gold coins. Which holding earns him NO periodic income?",
+   o:["Shares","Apartment","Bond","Gold coins"],a:3}
+]},
+
+{ch:1,d:3,topic:"Inflation Calculation",
+exp:"Future cost = Today's cost × (1 + inflation rate)^years. This is compounding forward. Dividing by (1+r)^n is discounting (finding present value of future amount — opposite direction). Simple interest understates long-term impact. Always compound forward when projecting the future cost of a financial goal.",
+forms:[
+  {q:"An expense of ₹80,000 today is required in 5 years. Inflation is 6% p.a. Future amount needed?",
+   o:["₹80,000 × (1.06)⁵","₹80,000 ÷ (1.06)⁵","₹80,000 + (₹80,000 × 6% × 5)","₹80,000 × 5 × 6%"],a:0},
+  {q:"The correct approach to estimate the FUTURE cost of a financial goal (accounting for inflation) is to ________ today's cost.",
+   o:["Discount","Compound forward","Divide by inflation rate","Subtract inflation from"],a:1},
+  {q:"Sapna's education costs ₹10 lakh today. She goes to college in 10 years. At 8% annual inflation, her parents need approximately ₹21.59 lakh. The ₹21.59 lakh is calculated as ________.",
+   o:["₹10L × 10 × 8%","₹10L ÷ (1.08)¹⁰","₹10L × (1.08)¹⁰","₹10L × (1 + 8 × 10%)"],a:2}
+]},
+
+{ch:1,d:2,topic:"Four Financial Needs",
+exp:"The four financial needs are: (1) Transaction needs — handled by banks. (2) Protection needs — handled by insurance. (3) Investment needs — handled by MFs, FDs, equities. (4) Retirement needs — has two phases: accumulation (pre-retirement, building corpus) and distribution (post-retirement, drawing income using annuities etc.).",
+forms:[
+  {q:"Which financial need is specifically addressed by life insurance companies?",
+   o:["Transaction needs","Investment needs","Protection needs","Retirement needs"],a:2},
+  {q:"The two phases of retirement planning are ________ and ________.",
+   o:["Growth phase and Income phase","Accumulation phase and Distribution phase","Saving phase and Spending phase","Active phase and Passive phase"],a:1},
+  {q:"Suresh retires and needs monthly income to fund his expenses. He invests in an annuity product. This primarily addresses his ________ need.",
+   o:["Transaction","Protection","Investment","Retirement (distribution phase)"],a:3}
+]},
+
+// ── CH2: CONCEPT & ROLE OF MF ──────────────────────────────────
+{ch:2,d:1,topic:"MF Legal Form",
+exp:"As per SEBI MF Regulations 1996, a mutual fund in India must be constituted as a TRUST governed by the Indian Trusts Act 1882. The trust structure — Sponsor → Trustees → AMC — is specifically designed to protect investors (unit-holders) who are the trust's beneficiaries. No other legal form is permitted.",
+forms:[
+  {q:"In India, a mutual fund is legally constituted as a ________.",
+   o:["Limited liability company","Trust","Partnership firm","Cooperative society"],a:1},
+  {q:"The Indian Trusts Act 1882 governs mutual funds because they are required to be formed as a ________.",
+   o:["Company","Society","Trust","LLP"],a:2},
+  {q:"Mutual fund investors are the ________ of the mutual fund trust.",
+   o:["Sponsors","Trustees","Beneficiaries","Directors"],a:2}
+]},
+
+{ch:2,d:1,topic:"NAV Meaning",
+exp:"NAV (Net Asset Value) is the true current market worth per unit of a scheme, calculated daily as: (Market value of all investments − Liabilities) ÷ Total units outstanding. Face value (₹10) is a fixed accounting value. AUM is total scheme size. NAV reflects daily market movements.",
+forms:[
+  {q:"NAV (Net Asset Value) of a mutual fund scheme represents ________.",
+   o:["Original face value of ₹10 per unit","Total assets under management","True current market worth per unit","Annual return percentage"],a:2},
+  {q:"The formula for computing a mutual fund's NAV is ________.",
+   o:["Total AUM ÷ Face value","(Market value of investments − Liabilities) ÷ Outstanding units","Total units × Face value","Annual return ÷ Total invested"],a:1},
+  {q:"A scheme's total investments are worth ₹200 cr, liabilities are ₹4 cr, and 40 cr units are outstanding. NAV = ?",
+   o:["₹5.00","₹4.90","₹4.80","₹5.10"],a:1}
+]},
+
+{ch:2,d:1,topic:"SIP / SWP / STP",
+exp:"SIP = Systematic Investment Plan (invest fixed amount regularly). SWP = Systematic Withdrawal Plan (withdraw fixed amount regularly). STP = Systematic Transfer Plan (transfer fixed amount from one scheme to another regularly — often from liquid fund to equity fund). These three are the core systematic facilities.",
+forms:[
+  {q:"STP in mutual funds stands for ________.",
+   o:["Systematic Trading Plan","Systematic Transfer Plan","Standard Tax Protocol","Sequential Transfer Procedure"],a:1},
+  {q:"Ananya sets up automatic monthly transfer of ₹5,000 from her liquid fund to her equity fund. This is called a ________.",
+   o:["SIP","SWP","STP","NFO"],a:2},
+  {q:"A retired investor sets up automatic monthly withdrawals from her debt fund to her bank account. This is a ________.",
+   o:["SIP","SWP","STP","ELSS"],a:1}
+]},
+
+{ch:2,d:2,topic:"IDCW Rename",
+exp:"SEBI renamed 'Dividend Option' to IDCW (Income Distribution cum Capital Withdrawal) from April 1, 2021. The new name is more accurate: the payout is NOT purely from profits — it can be a return of the investor's own capital, and the NAV always falls by the dividend amount. 'Dividend' implied pure profit distribution, which was misleading.",
+forms:[
+  {q:"From April 1, 2021, the 'Dividend Option' in mutual funds was renamed to ________.",
+   o:["Capital Return Option","Income Distribution cum Capital Withdrawal (IDCW)","Profit Sharing Plan","Regular Income Plan"],a:1},
+  {q:"SEBI renamed the Dividend Option to IDCW because the payout ________.",
+   o:["Is now taxed differently","Can be a return of the investor's own capital, not just profit","Must now be declared monthly","Can only be paid to NRI investors"],a:1},
+  {q:"After a mutual fund scheme pays ₹2 per unit as IDCW, the NAV of the scheme ________.",
+   o:["Stays unchanged","Increases by ₹2","Falls by ₹2 (ex-dividend NAV)","Falls by an amount less than ₹2"],a:2}
+]},
+
+{ch:2,d:2,topic:"Advantages of MF",
+exp:"Key MF advantages: Professional management, Affordable diversification (even ₹500 gets a diversified portfolio), Economies of scale (pooled money = lower costs), Transparency (SID, SAI, daily NAV), Liquidity (open-ended schemes redeemable anytime), Tax deferral (growth option lets gains accumulate tax-free until sold), ELSS gives 80C deduction, SIP/SWP/STP systematic approach.",
+forms:[
+  {q:"Which is a LIMITATION of mutual funds compared to Portfolio Management Services (PMS)?",
+   o:["Higher cost than PMS","No professional management","No portfolio customisation for individual investors","No transparency"],a:2},
+  {q:"A small investor with ₹500 invests in an equity mutual fund and gets exposure to 40+ stocks. This advantage is called ________.",
+   o:["Tax deferral","Affordable portfolio diversification","High liquidity","Regulatory comfort"],a:1},
+  {q:"Mutual fund schemes are NOT liable to pay tax on their income because they are ________.",
+   o:["Government-owned entities","Constituted as trusts exempt under Section 10(23)(D)","Registered as non-profit organisations","Regulated by RBI"],a:1}
+]},
+
+{ch:2,d:4,topic:"IDCW Reinvestment Math",
+exp:"Dividend % is always on FACE VALUE (₹10), NOT on current NAV. Total dividend = (Div% × Face value) × Number of units. Additional units in reinvestment = Total dividend ÷ Ex-dividend NAV. Ex-dividend NAV = NAV before dividend − Dividend per unit. This is the most common calculation error on exams.",
+forms:[
+  {q:"Investor holds 500 units. NAV = ₹25, face value = ₹10. 20% dividend declared. Ex-div NAV = ₹23. Additional units in reinvestment option?",
+   o:["43.48 units","50.00 units","21.74 units","46.00 units"],a:0},
+  {q:"A 15% IDCW is declared on a scheme with face value ₹10. The dividend PER UNIT is ________.",
+   o:["₹15.00","₹1.50","15% of current NAV","₹10 × current NAV × 15%"],a:1},
+  {q:"A 10% IDCW is declared. An investor holds 1,000 units with face value ₹10. Total dividend = ________, which in reinvestment option buys units at ex-dividend NAV.",
+   o:["₹10,000","₹1,000","10% of current portfolio value","₹100"],a:1}
+]},
+
+{ch:2,d:3,topic:"Open vs Close Ended",
+exp:"Open-ended: investors can buy/sell units at any time at NAV-based price. Close-ended: only during NFO; AMC doesn't buy back units later; SEBI mandates compulsory listing on stock exchange for investor exit; no Scheme Re-Opening Date. Interval funds: a combination — open during specific intervals only.",
+forms:[
+  {q:"Which of the following is TRUE about close-ended mutual fund schemes?",
+   o:["Investors can buy/sell from AMC at any time","Must be compulsorily listed on a stock exchange","They have no fixed maturity period","They continue accepting new investments after NFO"],a:1},
+  {q:"A close-ended mutual fund scheme is listed on a stock exchange because ________.",
+   o:["SEBI wants to generate brokerage revenue","Investors need an exit route since AMC won't buy units back","It helps the fund manager track prices","It increases the scheme's NAV"],a:1},
+  {q:"Unlike open-ended schemes, a close-ended scheme has NO ________.",
+   o:["NAV calculation","Scheme Re-Opening Date","Investment objective","Trustee board"],a:1}
+]},
+
+// ── CH3: LEGAL STRUCTURE ────────────────────────────────────────
+{ch:3,d:1,topic:"Minimum Trustees",
+exp:"SEBI requires minimum 4 trustees (or 4 directors if a Trustee Company is appointed). Additionally, at least 2/3 must be INDEPENDENT — not associated with the sponsor. This independence prevents the sponsor from stacking the board with allies and ensures genuine oversight.",
+forms:[
+  {q:"SEBI mandates a minimum of ________ trustees for a mutual fund.",
+   o:["2","3","4","6"],a:2},
+  {q:"Of the minimum 4 trustees, at least ________ must be independent of the sponsor.",
+   o:["1 (one-fourth)","2 (half)","At least 2/3 (two-thirds)","All 4"],a:2},
+  {q:"XYZ Mutual Fund has 6 trustees. Of these, at least ________ must NOT be associated with XYZ's sponsor.",
+   o:["2","3","4","6"],a:2}
+]},
+
+{ch:3,d:1,topic:"Four MF Constituents",
+exp:"4 key constituents: Sponsor (creates the trust, invests in AMC capital), Trustees (protect unit-holders, oversight), AMC (day-to-day management of schemes), Custodian (holds securities, gold in safekeeping). RTA (Registrar & Transfer Agent) maintains investor records. Separation of roles is the key investor protection mechanism.",
+forms:[
+  {q:"Who holds the physical custody of a mutual fund scheme's securities and gold?",
+   o:["AMC","RTA (Registrar & Transfer Agent)","Custodian","Sponsor"],a:2},
+  {q:"The entity responsible for the day-to-day management of mutual fund schemes is the ________.",
+   o:["Sponsor","Board of Trustees","AMC","Custodian"],a:2},
+  {q:"The MAIN reason for separating the AMC (which manages the fund) and the Custodian (which holds the assets) is ________.",
+   o:["To reduce the fund's TER","Investor protection — assets remain safe even if AMC fails","To comply with RBI guidelines","To make NAV calculation easier"],a:1}
+]},
+
+{ch:3,d:2,topic:"Sponsor Requirements",
+exp:"Sponsor eligibility: (1) minimum 5 years in financial services, (2) positive net worth for all of the preceding 5 consecutive years, (3) fit and proper person with clean track record. These ensure only financially stable, credible entities run mutual funds.",
+forms:[
+  {q:"A mutual fund sponsor must have been in financial services for at least ________ years.",
+   o:["3","5","7","10"],a:1},
+  {q:"Which condition must a sponsor satisfy regarding net worth?",
+   o:["Positive net worth for the last 3 years","Positive net worth in each of the preceding 5 years","Net worth of minimum ₹100 crore","No minimum net worth required"],a:1},
+  {q:"Which of these would DISQUALIFY a company from being a mutual fund sponsor?",
+   o:["Being a 7-year-old financial services company","Having positive net worth for 5 consecutive years","Having net losses in 2 of the last 5 years","Being listed on a stock exchange"],a:2}
+]},
+
+{ch:3,d:3,topic:"Trustee Cannot Be",
+exp:"SEBI explicitly prohibits: (1) Any AMC director/officer/employee from being trustee of the SAME fund (prevents self-supervision). (2) A trustee of one MF cannot be trustee of another MF simultaneously. (3) Person convicted of economic offence or securities law violation. Prior SEBI approval needed before any trustee appointment.",
+forms:[
+  {q:"Who CANNOT be appointed as a trustee of a mutual fund?",
+   o:["A retired Supreme Court judge with no MF connections","A senior banker unrelated to the sponsor","A director of the AMC of that same mutual fund","A CA with a clean record"],a:2},
+  {q:"Can a person simultaneously serve as trustee of two different mutual funds?",
+   o:["Yes, if both MFs agree","Yes, with SEBI's permission","No, SEBI regulations prohibit this","Only if both MFs are from the same sponsor"],a:2},
+  {q:"Trustee Mr. Sharma of XYZ Mutual Fund wants to join the Board of Directors of XYZ AMC. Is this permitted?",
+   o:["Yes, since he understands the business well","Yes, with trustee board approval","No, AMC directors cannot be trustees of the same fund","Only permitted after 2 years of trusteeship"],a:2}
+]},
+
+{ch:3,d:2,topic:"ARN and EUIN",
+exp:"ARN (AMFI Registration Number): mandatory for all MF distributors — individual or institutional. Must pass NISM exam and register with AMFI. Must be quoted on all investment application forms. EUIN (Employee Unique Identification Number): for specific employees within a distributor firm who interact with and advise investors. ARN = entity; EUIN = individual within entity.",
+forms:[
+  {q:"ARN (AMFI Registration Number) is required by ________.",
+   o:["All mutual fund investors","All mutual fund distributors before distributing MF schemes","Only institutional distributors","The fund manager of the AMC"],a:1},
+  {q:"The difference between ARN and EUIN is that ARN identifies ________ while EUIN identifies ________.",
+   o:["The investor; the scheme","The distributor entity; the specific employee who advised the investor","The AMC; the distributor","The scheme; the investor"],a:1},
+  {q:"On a mutual fund application form, the distributor's ________ must be mentioned.",
+   o:["PAN number","EUIN only","ARN number","Aadhaar number"],a:2}
+]},
+
+// ── CH4: MF PRODUCTS FOR NEW CADRE ─────────────────────────────
+{ch:4,d:1,topic:"New Cadre Eligibility",
+exp:"New cadre distributors: (1) Postal agents, (2) Retired govt/semi-govt officials (Class III+, 10+ years service), (3) Retired bank officers (10+ years service), (4) Retired teachers (10+ years service), (5) Bank correspondents. Key requirements: RETIRED status AND minimum 10 years service. Products allowed: liquid/money market, index funds, diversified equity, retirement benefit schemes, FMPs.",
+forms:[
+  {q:"Which of these people qualifies as a 'new cadre' mutual fund distributor?",
+   o:["Fresh MBA with 2 years banking experience","Active government employee with 15 years service","Retired Class-III government officer with 12 years service","Retired bank officer with 8 years service"],a:2},
+  {q:"A new cadre distributor can distribute only 'simple and performing' schemes. 'Performing' means returns ________ in each of the last 3 years.",
+   o:["Greater than 15%","Equal to or better than the scheme's benchmark","Better than fixed deposits","Positive (above zero)"],a:1},
+  {q:"Which product is NOT on the list of schemes a new cadre distributor can sell?",
+   o:["Liquid funds","Index funds","Sector/Thematic equity funds","Fixed Maturity Plans"],a:2}
+]},
+
+{ch:4,d:2,topic:"Liquid vs Money Market Fund",
+exp:"Liquid Fund: invests in debt/money market securities with maturity up to 91 DAYS only. Money Market Fund: invests in money market instruments with maturity up to 1 YEAR. Both have very low interest rate and credit risk. Liquid funds are the shortest-duration, lowest-risk MF category — ideal for parking surplus cash for uncertain short periods.",
+forms:[
+  {q:"A liquid fund invests ONLY in securities with maturity up to ________ days.",
+   o:["30","60","91","180"],a:2},
+  {q:"Compared to a liquid fund, a money market fund ________ in terms of maturity range.",
+   o:["Has the same maximum maturity (91 days)","Has a shorter maximum maturity","Has a longer maximum maturity (up to 1 year)","Has no maturity restriction"],a:2},
+  {q:"Kavita has surplus money she may need within 2 weeks. The MOST appropriate MF category is a ________.",
+   o:["Diversified equity fund","Long duration bond fund","Liquid fund","Retirement benefit fund"],a:2}
+]},
+
+{ch:4,d:2,topic:"Index Fund",
+exp:"Index fund: replicates/tracks a specific index. Must invest minimum 95% of assets in the index's constituent securities. Called 'passive' because fund manager doesn't pick stocks — just mirrors the index composition. Low TER (because minimal active management). Easy to track performance. S&P BSE Sensex = 30 large companies on BSE; NIFTY 50 = 50 large companies on NSE.",
+forms:[
+  {q:"An index fund must invest at least ________% of assets in securities of the tracked index.",
+   o:["80","85","90","95"],a:3},
+  {q:"An index fund is called a 'passive' fund because ________.",
+   o:["It invests in low-risk bonds passively","The fund manager does not actively pick securities — just mirrors the index","It requires no regulation by SEBI","Investors cannot actively buy or sell it"],a:1},
+  {q:"S&P BSE Sensex represents ________ large companies listed on the BSE.",
+   o:["20","30","50","100"],a:1}
+]},
+
+{ch:4,d:3,topic:"FMP Features",
+exp:"FMP (Fixed Maturity Plan): close-ended debt fund. Portfolio pre-identified at launch and held to maturity. No redemption before maturity. Returns more predictable (not guaranteed). Compulsory listing on stock exchange for investor exit. Low active management — almost no fund manager role post-NFO. Returns come from yield on pre-identified debt securities.",
+forms:[
+  {q:"Which statement about Fixed Maturity Plans (FMPs) is TRUE?",
+   o:["Open-ended; can be redeemed anytime at NAV","Close-ended; compulsory listing on stock exchange for liquidity","Returns are guaranteed to beat fixed deposits","Fund manager actively trades to maximise gains"],a:1},
+  {q:"An investor puts money in a 2-year FMP but needs the money after 1 year. Her options are ________.",
+   o:["Redeem from AMC at current NAV","No redemption from AMC; must sell on stock exchange (if trading volumes allow)","Request AMC for partial redemption","Transfer to another scheme via STP"],a:1},
+  {q:"The returns of an FMP are relatively more PREDICTABLE than other debt funds because ________.",
+   o:["The NAV is fixed at ₹10","The portfolio is pre-identified and held to maturity","Returns are guaranteed by the AMC","SEBI fixes the return rate for FMPs"],a:1}
+]},
+
+// ── CH5: SCHEME RELATED INFO ────────────────────────────────────
+{ch:5,d:1,topic:"Three Key Scheme Documents",
+exp:"SID (Scheme Information Document): scheme-specific details — investment objective, asset allocation, risks, fees. SAI (Statement of Additional Information): statutory info about the AMC/fund — one SAI covers all schemes of that AMC. KIM (Key Information Memorandum): 2-page summary distributed with application forms. Caveat emptor: investor is presumed to have read these before investing.",
+forms:[
+  {q:"Which document contains scheme-SPECIFIC details like investment objective, asset allocation and risk factors?",
+   o:["SAI (Statement of Additional Information)","KIM (Key Information Memorandum)","Annual Report","SID (Scheme Information Document)"],a:3},
+  {q:"One SAI covers ________ of a mutual fund.",
+   o:["One specific scheme","Only equity schemes","All schemes of that AMC","All schemes across all AMCs"],a:2},
+  {q:"KIM (Key Information Memorandum) is best described as ________.",
+   o:["A comprehensive 100-page scheme document","A 2-page summary document distributed with application forms","The AMC's annual financial report","A daily publication of NAV values"],a:1}
+]},
+
+{ch:5,d:2,topic:"Direct vs Regular Plan",
+exp:"Direct and Regular plans invest in EXACTLY the same portfolio — same stocks/bonds, same fund manager. The ONLY difference is cost. Regular Plan TER includes distributor commission and distribution expenses. Direct Plan TER excludes these (no distributor = no commission). Lower TER in Direct Plan → higher NAV over time → higher returns, all else being equal.",
+forms:[
+  {q:"Why does a Direct Plan have a LOWER TER than the Regular Plan of the same scheme?",
+   o:["It invests in safer, less-risky instruments","It excludes distributor commission and distribution expenses","It has fewer investors so costs per head are lower","It has a lower fund management fee"],a:1},
+  {q:"Both Direct and Regular plans of the same scheme invest in identical portfolios. Yet Direct Plan shows a higher NAV over time. The reason is ________.",
+   o:["Direct Plan's fund manager is better","Direct Plan pays lower fund management fees","Direct Plan has lower TER (no distribution costs)","Direct Plan gets better deals on securities"],a:2},
+  {q:"If an investor routes their mutual fund investment through a distributor, they are automatically in the ________ plan.",
+   o:["Direct","Low-cost","Regular","Institutional"],a:2}
+]},
+
+{ch:5,d:4,topic:"Fundamental Attributes",
+exp:"Fundamental attributes of a scheme (cannot change without proper notice and exit option): (1) Type of scheme, (2) Investment objective, (3) Investment patterns, (4) Terms of issue. The FUND MANAGER'S NAME is NOT a fundamental attribute — AMCs can change fund managers freely without giving unitholders an exit option.",
+forms:[
+  {q:"Which is NOT a 'fundamental attribute' of a mutual fund scheme?",
+   o:["Type of scheme (equity/debt)","Investment objective","Fund manager's name","Terms of issue"],a:2},
+  {q:"If a trustee wants to change a scheme's investment objective, unitholders must be ________.",
+   o:["Notified only by email","Given prior notice, newspaper announcement, and the option to exit at NAV without exit load","Given 24-hour notice to exit","Not notified — trustees can change objective freely"],a:1},
+  {q:"Changing which of these requires written notice to EVERY unitholder AND an exit option at NAV without exit load?",
+   o:["Fund manager","Distributor empanelment","Type of scheme (fundamental attribute)","NFO price"],a:2}
+]},
+
+// ── CH6: FUND DISTRIBUTION ──────────────────────────────────────
+{ch:6,d:1,topic:"Entry Load Abolished",
+exp:"SEBI abolished entry loads on MF purchases effective August 2009. Before 2009, investors paid 2-2.5% upfront on every purchase — this went to distributors. Post-2009, 100% of invested amount goes into units. Exit loads still exist (charged on early redemption) but go to the SCHEME (not distributors). Distributor income now comes primarily from trail commission.",
+forms:[
+  {q:"SEBI abolished entry loads on mutual fund purchases in ________.",
+   o:["2005","2007","2009","2012"],a:2},
+  {q:"Before 2009, an investor putting ₹1 lakh in an equity MF paid a 2.5% entry load. The actual amount invested in units was ________.",
+   o:["₹1,02,500","₹1,00,000","₹97,500","₹97,000"],a:2},
+  {q:"Since the abolition of entry load, the PRIMARY ongoing revenue source for most MF distributors is ________.",
+   o:["Exit loads charged on redemption","Trail commission (ongoing % of AUM)","Annual advisory fees from investors","NFO commissions"],a:1}
+]},
+
+{ch:6,d:2,topic:"Trail Commission",
+exp:"Trail commission: an ongoing % (e.g. 0.5-1% p.a.) of the current AUM attributable to the distributor's clients, paid monthly by the AMC from the scheme's TER. As long as the investor stays invested, the distributor earns trail. This aligns incentives — distributors are rewarded for keeping clients properly invested long-term rather than churning.",
+forms:[
+  {q:"Trail commission for a mutual fund distributor is ________.",
+   o:["A one-time payment at time of investment","An ongoing % of the AUM of units sold by the distributor","A fixed annual fee from the investor","Paid only when the scheme outperforms its benchmark"],a:1},
+  {q:"Distributor A brings ₹1 crore of client assets. Trail = 0.5% p.a. of AUM. Monthly trail earned = approximately ________.",
+   o:["₹50,000","₹5,000","₹500","₹41,667"],a:1},
+  {q:"Trail commission incentivises distributors to ________.",
+   o:["Churn investments frequently for higher commissions","Keep clients properly invested for the long term","Switch clients to highest-commission products","Recommend only NFOs"],a:1}
+]},
+
+{ch:6,d:3,topic:"Commission Disclosure",
+exp:"SEBI mandates that all distributors must disclose commission to ALL investors (no minimum threshold): (1) absolute rupee amount of commission earned, AND (2) commission as a % of the investment amount. This prevents undisclosed conflicts of interest — an investor who knows their distributor earns more on Product X can make a better-informed decision.",
+forms:[
+  {q:"SEBI requires distributors to disclose commission ________.",
+   o:["Only on investments above ₹1 lakh","Both as absolute rupee amount AND as % of investment, to ALL investors","Only if the investor specifically asks","Only for lump sum investments, not SIPs"],a:1},
+  {q:"Commission disclosure to investors serves primarily to ________.",
+   o:["Increase the distributor's income","Allow SEBI to collect taxes on commissions","Prevent undisclosed conflicts of interest in scheme recommendations","Enable investors to negotiate commissions"],a:2},
+  {q:"Distributor earns ₹150 on a ₹10,000 investment. SEBI requires disclosure of both '₹150' AND '1.5%'. This means the investor knows ________.",
+   o:["The distributor is overcharging","Exactly how much the distributor earns from their money","The scheme's TER","The fund manager's salary"],a:1}
+]},
+
+// ── CH7: MF PERFORMANCE ─────────────────────────────────────────
+{ch:7,d:1,topic:"Simple Return Calculation",
+exp:"Simple Return = (Exit NAV − Entry NAV) ÷ Entry NAV × 100. Always divide by the ENTRY (purchase) NAV, not exit NAV. Common error: dividing by exit NAV. If dividend also received, it must be added to numerator: Return = (Exit NAV − Entry NAV + Dividends received) ÷ Entry NAV × 100.",
+forms:[
+  {q:"Units bought at NAV ₹10, sold at NAV ₹14. Simple return?",
+   o:["28.6%","40%","30%","14%"],a:1},
+  {q:"Simple Return formula: ________ ÷ Entry NAV × 100.",
+   o:["Exit NAV only","(Exit NAV + Dividends − Entry NAV)","Entry NAV − Exit NAV","Exit NAV × Entry NAV"],a:1},
+  {q:"NAV rose from ₹40 to ₹52. An investor also received ₹2 dividend during holding. Total simple return = ?",
+   o:["30%","25%","35%","32%"],a:2}
+]},
+
+{ch:7,d:2,topic:"Beta Interpretation",
+exp:"Beta measures a fund's sensitivity to market (benchmark) movements. Beta = 1: moves exactly with market. Beta > 1: more volatile than market (e.g. Beta 1.3 = if market falls 10%, fund typically falls 13%). Beta < 1: less volatile (e.g. Beta 0.7 = if market rises 10%, fund rises only 7%). Beta measures ONLY systematic (market) risk, not total risk.",
+forms:[
+  {q:"A fund with Beta = 1.3 relative to its benchmark means ________.",
+   o:["Returns exactly 1.3% every month","30% more volatile than the benchmark","Always outperforms benchmark by 30%","30% less risky than the market"],a:1},
+  {q:"Market falls 15%. Fund A has Beta=0.8. Fund A likely falls by approximately ________.",
+   o:["15%","18.75%","12%","0% (it's protected)"],a:2},
+  {q:"Which Beta value indicates a DEFENSIVE fund that is less volatile than the market?",
+   o:["Beta = 1.5","Beta = 1.0","Beta = 0.6","Beta = 2.0"],a:2}
+]},
+
+{ch:7,d:2,topic:"Interest Rate Risk",
+exp:"Interest rate risk: inverse relationship between interest rates and bond prices. When rates rise → bond prices fall (and vice versa). LONGER duration bonds fall MORE when rates rise (locked at lower rates for longer). So: Long duration debt funds have MAXIMUM interest rate risk. Liquid funds (91-day securities) have near-zero interest rate risk. Equity funds have market risk, not interest rate risk.",
+forms:[
+  {q:"Which mutual fund category has the HIGHEST interest rate risk?",
+   o:["Liquid fund (up to 91 days)","Short duration fund (1-3 years)","Long duration fund (7+ years)","Equity large-cap fund"],a:2},
+  {q:"Interest rates in the economy rise by 1%. Which fund's NAV is MOST negatively impacted?",
+   o:["Liquid fund","Money market fund","Long duration debt fund","Index fund"],a:2},
+  {q:"The inverse relationship between bond prices and interest rates means: as duration increases, interest rate risk ________.",
+   o:["Decreases","Stays the same","Increases","Becomes irrelevant"],a:2}
+]},
+
+{ch:7,d:3,topic:"Sharpe Ratio",
+exp:"Sharpe Ratio = (Portfolio return − Risk-free rate) ÷ Standard deviation. Measures risk-adjusted return — how much excess return per unit of TOTAL risk taken. Higher Sharpe = better risk-adjusted performance. Alpha = excess return over benchmark (positive alpha = outperformance). Standard deviation measures total volatility.",
+forms:[
+  {q:"Sharpe Ratio is calculated as ________.",
+   o:["(Portfolio return − Benchmark return) ÷ Beta","(Portfolio return − Risk-free rate) ÷ Standard deviation","Portfolio return × Beta","Standard deviation ÷ Portfolio return"],a:1},
+  {q:"Fund X: Sharpe = 1.5. Fund Y: Sharpe = 0.8. Which is the better risk-adjusted investment?",
+   o:["Fund Y (lower Sharpe = lower risk)","Fund X (higher Sharpe = better risk-adjusted return)","They are equivalent","Cannot determine without knowing beta"],a:1},
+  {q:"'Alpha' in mutual fund performance means ________.",
+   o:["Total return of the fund","Excess return of the fund over its benchmark (positive = outperformance)","The fund's interest rate sensitivity","Volatility of the fund relative to market"],a:1}
+]},
+
+{ch:7,d:3,topic:"Exit Load Beneficiary",
+exp:"Exit loads go back to the SCHEME (not to the AMC or distributor). This protects long-term investors from the transaction costs caused by short-term traders. Entry load (abolished 2009) used to go to distributors. Exit load = scheme. Distributor income = trail commission, NOT exit loads.",
+forms:[
+  {q:"Exit load collected from an investor on redemption is credited to ________.",
+   o:["The mutual fund distributor","The AMC as revenue","The mutual fund scheme itself","SEBI as a regulatory fee"],a:2},
+  {q:"Why does exit load go to the scheme and not to the AMC or distributor?",
+   o:["To increase distributor's income","To protect long-term investors from costs caused by short-term traders","To pay SEBI's registration fees","It's a legal requirement with no specific purpose"],a:1},
+  {q:"Amit redeems his equity fund within 6 months and pays ₹1,000 as exit load. This ₹1,000 goes to ________.",
+   o:["Amit's distributor","The AMC","The scheme's NAV (benefits remaining unit-holders)","SEBI"],a:2}
+]},
+
+// ── CH8: TAXATION ───────────────────────────────────────────────
+{ch:8,d:1,topic:"MF Scheme Tax Exemption",
+exp:"Mutual fund schemes (trusts) are completely exempt from income tax under Section 10(23)(D) of the Income Tax Act. The MF is a pass-through vehicle — it pays no tax. All income/gains pass through to investors who pay tax at their applicable rates. This is foundational to MF taxation.",
+forms:[
+  {q:"Income earned by a mutual fund scheme itself is ________.",
+   o:["Taxed at 22% corporate rate","Exempt from income tax under Section 10(23)(D)","Taxed at a flat 15%","Subject to quarterly advance tax"],a:1},
+  {q:"Section 10(23)(D) of the Income Tax Act applies to ________.",
+   o:["Income of MF investors","Income of MF distributors","Income earned by mutual fund schemes","Capital gains of equity investors"],a:2},
+  {q:"A mutual fund scheme earns ₹5 crore in dividends from its equity portfolio. How much income tax does the SCHEME pay on this?",
+   o:["₹1.1 crore (22%)","₹75 lakh (15%)","₹0 (exempt under Section 10(23)(D))","₹25 lakh (5%)"],a:2}
+]},
+
+{ch:8,d:2,topic:"Equity-Oriented Fund Definition",
+exp:"Income Tax Act: equity-oriented MF = holds more than 65% of AUM in equity shares listed on recognised Indian stock exchanges. Below 65% = non-equity-oriented (different, usually less favourable tax treatment). TRAP: A Fund-of-Funds (FoF) investing 100% in equity MFs is still classified as NON-equity oriented because it doesn't directly hold listed equity shares — it holds units of other funds.",
+forms:[
+  {q:"A fund is 'equity-oriented' for tax purposes if it holds more than ________% in Indian listed equity.",
+   o:["51","60","65","75"],a:2},
+  {q:"A Fund-of-Funds invests 100% in equity mutual fund schemes. For income tax purposes, it is classified as ________.",
+   o:["Equity-oriented (as it ultimately invests in equity)","Non-equity-oriented (as it doesn't DIRECTLY hold listed equity shares)","Hybrid fund","Debt fund"],a:1},
+  {q:"A multi-asset fund holds 60% equity, 30% gold, 10% debt. For income tax, it is ________.",
+   o:["Equity-oriented (holds equity)","Non-equity-oriented (equity < 65%)","Taxed as a gold fund","Exempt from all capital gains tax"],a:1}
+]},
+
+{ch:8,d:3,topic:"Capital Gains Holding Period",
+exp:"Equity-oriented MF holding period: >12 months = LTCG (taxed at 12.5%, first ₹1.25L per year is tax-free). ≤12 months = STCG (taxed at 20%). For ALL other assets (non-equity MFs, gold, real estate): >24 months = LTCG. ≤24 months = STCG.",
+forms:[
+  {q:"For equity-oriented MFs, gains on units held more than ________ months qualify as LTCG.",
+   o:["6","12","24","36"],a:1},
+  {q:"STCG on equity-oriented MF units is taxed at ________ and LTCG at ________.",
+   o:["10%; 5%","15%; 10%","20%; 12.5%","30%; 15%"],a:2},
+  {q:"Asha bought equity MF units on Jan 1, 2024. She wants LTCG treatment. The EARLIEST she can sell is ________.",
+   o:["July 1, 2024 (6 months)","Jan 2, 2025 (after 12 months)","Jan 1, 2026 (after 24 months)","Jan 1, 2027 (after 36 months)"],a:1}
+]},
+
+{ch:8,d:4,topic:"LTCG Tax Calculation",
+exp:"LTCG on equity-oriented MF: first ₹1.25 lakh per year is tax-free. Tax only on gains ABOVE ₹1.25L at 12.5%. If total LTCG ≤ ₹1.25L → zero tax. Common error: applying 12.5% on the full amount without deducting the exemption. Budget 2024 (effective July 23, 2024) changed rates from 10% to 12.5% and raised exemption from ₹1L to ₹1.25L.",
+forms:[
+  {q:"An investor earns ₹2,00,000 LTCG from equity MF. First ₹1.25L exempt, rate 12.5%. Tax payable?",
+   o:["₹25,000","₹9,375","₹15,625","₹0"],a:1},
+  {q:"If an investor's total LTCG from equity-oriented MF in a year is ₹90,000, the LTCG tax payable is ________.",
+   o:["₹11,250","₹9,000","₹0 (under the ₹1.25L exemption)","₹13,500"],a:2},
+  {q:"Total LTCG ₹1,50,000 from equity MF. Exemption = ₹1,25,000. Tax rate = 12.5%. Tax = ?",
+   o:["₹18,750","₹3,125","₹25,000","₹15,000"],a:1}
+]},
+
+{ch:8,d:3,topic:"IDCW Tax Change 2020",
+exp:"Pre-Budget 2020: Dividend Distribution Tax (DDT) was paid by the scheme — dividends were tax-free in investor hands. Budget 2020 abolished DDT. Now: dividends (IDCW) are added to the investor's total income and taxed at their applicable slab rate (0-30%). High-income investors now pay much more. Growth option remains more tax-efficient for most investors because gains compound tax-free until sale.",
+forms:[
+  {q:"Since Budget 2020, IDCW income from mutual funds is ________.",
+   o:["Completely tax-free in investors' hands","Taxed at a flat 10%","Added to investor's total income, taxed at their slab rate","Still subject to DDT deducted by the scheme"],a:2},
+  {q:"Before Budget 2020, who paid the Dividend Distribution Tax (DDT) on MF dividends?",
+   o:["The investor directly","The distributor","The mutual fund SCHEME (before distribution)","SEBI"],a:2},
+  {q:"An investor in the 30% tax slab receives ₹10,000 IDCW in FY2025. Tax payable on this = approximately ________.",
+   o:["₹0 (IDCW is tax-free)","₹1,000 (10% DDT)","₹3,000 (30% slab rate)","₹1,500 (15% special rate)"],a:2}
+]},
+
+{ch:8,d:5,topic:"Stamp Duty",
+exp:"Stamp duty on MF unit PURCHASES: 0.005% (not on redemptions). Effective July 1, 2020. Example: ₹10,000 invested → stamp duty = ₹0.50 → units allotted on ₹9,999.50. Rate = 0.005% = 5 paise per ₹1,000. Only on PURCHASE not redemption. Don't confuse with STT (Securities Transaction Tax) which is different.",
+forms:[
+  {q:"Stamp duty on mutual fund purchases is charged at ________.",
+   o:["0.001%","0.005%","0.01%","0.05%"],a:1},
+  {q:"On a ₹50,000 SIP instalment, stamp duty deducted before unit allotment = ________.",
+   o:["₹50","₹25","₹2.50","₹5"],a:2},
+  {q:"Stamp duty on MF transactions applies to ________ (purchase/redemption/both).",
+   o:["Only redemptions","Only purchases","Both purchases and redemptions","Neither"],a:1}
+]},
+
+// ── CH9: INVESTOR SERVICES ──────────────────────────────────────
+{ch:9,d:1,topic:"NFO Dates and Duration",
+exp:"NFO has 3 dates: (1) NFO Open Date — subscriptions begin. (2) NFO Close Date — last day to invest. (3) Scheme Re-Opening Date — ongoing purchase/redemption begins. Maximum NFO duration: 15 days (except ELSS). Close-ended schemes have no Re-Opening Date — they're listed on exchanges instead.",
+forms:[
+  {q:"For most open-ended schemes, an NFO can remain open for a maximum of ________ days.",
+   o:["7","10","15","30"],a:2},
+  {q:"The 'Scheme Re-Opening Date' in an NFO refers to ________.",
+   o:["The date NAV is first calculated","The date when ongoing purchase and redemption of units begins","The date AMC repays investor money","The date SEBI approves the scheme"],a:1},
+  {q:"A close-ended MF scheme does NOT have a Scheme Re-Opening Date because ________.",
+   o:["SEBI hasn't approved ongoing transactions","AMC doesn't buy back units — investors must exit via stock exchange","The scheme's NAV is fixed","Only institutional investors can invest"],a:1}
+]},
+
+{ch:9,d:1,topic:"Joint Holders and Folio",
+exp:"A mutual fund folio can have maximum 3 joint holders. First holder is primary — all benefits (IDCW, redemptions, tax statements) go to them. All holders must be KYC-compliant. Once jointly held, joint holders CANNOT be added or removed (except deletion on death). Mode of operation (single/joint/either-or-survivor) is chosen at the time of opening.",
+forms:[
+  {q:"A mutual fund folio can have a MAXIMUM of ________ holders.",
+   o:["1","2","3","4"],a:2},
+  {q:"In a jointly held folio, all benefits like IDCW and redemption payments go to ________.",
+   o:["All holders equally","The last holder","The first (primary) holder","Whoever claims first"],a:2},
+  {q:"After a joint mutual fund folio is opened with 3 holders, can a 4th holder be added later?",
+   o:["Yes, with AMC approval","Yes, with all existing holders' consent","No, joint holders cannot be changed after folio creation","Yes, but only if SEBI approves"],a:2}
+]},
+
+{ch:9,d:2,topic:"Cut-off Times",
+exp:"Equity/Debt fund purchases: cut-off = 3:00 PM. NAV = day when funds are available for utilisation BEFORE 3 PM (not when form is submitted). Liquid/Overnight fund purchases: cut-off = 1:30 PM. NAV = PREVIOUS day's closing NAV if funds available before 1:30 PM. Redemptions (equity/debt): 3:00 PM cut-off — same day NAV if before cut-off, next business day NAV if after.",
+forms:[
+  {q:"For equity and debt fund PURCHASES, the cut-off time for NAV applicability is ________.",
+   o:["1:30 PM","2:00 PM","3:00 PM","4:00 PM"],a:2},
+  {q:"For liquid fund PURCHASES, the cut-off time is ________ and the applicable NAV is ________.",
+   o:["3:00 PM; same day's NAV","1:30 PM; previous day's closing NAV","1:30 PM; next day's NAV","3:00 PM; previous day's NAV"],a:1},
+  {q:"An investor submits equity fund purchase form at 2 PM on Monday. The cheque clears Tuesday at 10 AM. Which NAV applies?",
+   o:["Monday's NAV (application was before 3 PM)","Tuesday's NAV (funds available before Tuesday's 3 PM cut-off)","Wednesday's NAV","Friday's NAV"],a:1}
+]},
+
+{ch:9,d:2,topic:"IAF Instant Access",
+exp:"IAF (Instant Access Facility) = same-day credit of redemption proceeds. Available ONLY in liquid schemes. Daily limit per investor per scheme: ₹50,000 OR 90% of latest investment value, whichever is LOWER. For IAF before cut-off: NAV = lower of previous day's or current day's NAV (protective rule).",
+forms:[
+  {q:"Instant Access Facility (IAF) is available ONLY in ________ schemes.",
+   o:["Equity large-cap funds","Hybrid aggressive funds","Liquid schemes","All open-ended schemes"],a:2},
+  {q:"Mohan has ₹80,000 in a liquid fund. Maximum he can withdraw through IAF on one day = ________.",
+   o:["₹80,000 (full amount)","₹72,000 (90% of ₹80,000)","₹50,000 (lower of ₹50K or 90% of ₹80K)","₹8,000 (10% daily limit)"],a:2},
+  {q:"The daily IAF limit is ₹50,000 OR ________ of latest investment value — whichever is LOWER.",
+   o:["50%","75%","90%","95%"],a:2}
+]},
+
+{ch:9,d:3,topic:"Redemption on FIFO",
+exp:"Mutual fund redemptions follow mandatory FIFO (First In, First Out). Oldest units purchased are always redeemed first — investor has NO choice. This matters for taxation: if you bought units 18 months ago and 6 months ago, FIFO means older units exit first → potentially LTCG treatment (12.5%) vs STCG (20%) for newer units.",
+forms:[
+  {q:"When redeeming from a folio with units bought on multiple dates, which units are redeemed first?",
+   o:["Most recently bought (LIFO)","Most profitable units","Oldest units (FIFO — First In, First Out)","Investor's choice"],a:2},
+  {q:"FIFO rule in MF redemption means: if you have units bought 2 years ago and units bought 2 months ago, and you redeem 50%, the redeemed units are ________.",
+   o:["The 2-month units (most liquid)","The 2-year units (oldest first)","A 50-50 mix of both","Whichever the AMC decides"],a:1},
+  {q:"From a tax perspective, FIFO benefits long-term investors because ________.",
+   o:["It avoids exit loads","Older (long-term) units are redeemed first — potentially attracting lower LTCG tax rate","It converts STCG to LTCG","It eliminates stamp duty"],a:1}
+]},
+
+{ch:9,d:3,topic:"Minor Account Rules",
+exp:"Minor investor's folio: guardian operates it. No joint holders allowed for a minor's folio. On turning 18: account is FROZEN until minor updates their own KYC, PAN, bank-attested signature, and bank account details — replacing the guardian's. Guardian cannot continue. All SIPs stop. This protects the new adult's financial autonomy.",
+forms:[
+  {q:"When a minor mutual fund investor turns 18, their folio ________.",
+   o:["Automatically converts with guardian becoming primary holder","Is closed and proceeds paid out","Is frozen for all transactions until the minor updates their own KYC/PAN/bank details","Continues operating normally with guardian"],a:2},
+  {q:"A minor's mutual fund folio CANNOT have ________.",
+   o:["A guardian as operator","A nomination","Joint holders","Any investment in equity funds"],a:2},
+  {q:"After Meera turns 18, her mutual fund folio is frozen. To unfreeze it, she must ________.",
+   o:["Just give a phone call to the AMC","Submit her own KYC, PAN, bank-attested signature, replacing guardian's details","Wait 6 months and it auto-unfreezes","Get court approval"],a:1}
+]},
+
+{ch:9,d:3,topic:"Payment Methods",
+exp:"Allowed MF payment modes: Net banking, RTGS, NEFT, NACH, UPI, Debit cards. CREDIT CARDS ARE NOT ALLOWED for MF purchases. E-wallet limit: ₹50,000 per investor per financial year per MF (umbrella limit covering both e-wallet and cash). Only e-wallet amounts loaded via cash/debit/net banking allowed — NOT credit card, cashback, or promotional amounts.",
+forms:[
+  {q:"Which payment mode is NOT allowed for mutual fund purchases?",
+   o:["UPI","NEFT","Credit card","Debit card"],a:2},
+  {q:"Maximum e-wallet investment in MFs per investor per financial year per AMC is ________.",
+   o:["₹10,000","₹25,000","₹50,000","₹1,00,000"],a:2},
+  {q:"An investor loads ₹20,000 into an e-wallet using a credit card and tries to invest in a mutual fund. Is this allowed?",
+   o:["Yes, e-wallets are always accepted","Yes, up to ₹50,000 annually","No, amounts loaded via credit card cannot be used for MF subscription","Yes, if KYC is complete"],a:2}
+]},
+
+{ch:9,d:4,topic:"SIP Rupee Cost Averaging",
+exp:"Rupee cost averaging: with a fixed monthly SIP amount, you buy MORE units when NAV is LOW and FEWER units when NAV is HIGH. Over time, average cost per unit is lower than the average NAV during the same period. This works best in volatile markets and removes need to time the market. SIP doesn't guarantee returns or provide any tax exemption.",
+forms:[
+  {q:"How does SIP's 'rupee cost averaging' benefit investors in volatile markets?",
+   o:["SIP guarantees higher returns than lump sum","Fixed amount buys more units when NAV is LOW and fewer when HIGH — reducing average cost","SIP avoids capital gains tax","SIP invests in less-risky instruments automatically"],a:1},
+  {q:"Month 1: NAV=₹50, SIP=₹5,000 (100 units). Month 2: NAV=₹25, SIP=₹5,000 (200 units). Average NAV = ₹37.5, average cost per unit = ________.",
+   o:["₹37.50","₹33.33","₹25.00","₹50.00"],a:1},
+  {q:"Rupee cost averaging through SIP is MOST beneficial in ________ markets.",
+   o:["Consistently rising (bull) markets","Flat, non-volatile markets","Volatile or declining markets where NAVs fluctuate","Markets where NAV is always above ₹10"],a:2}
+]},
+
+// ── CH10: LEGAL & REGULATORY ─────────────────────────────────────
+{ch:10,d:1,topic:"SEBI as Regulator",
+exp:"SEBI (Securities and Exchange Board of India) is the primary statutory regulator of mutual funds, established under SEBI Act 1992. SEBI approves new schemes, sets investment limits, regulates AMCs, and enforces investor protection. AMFI is an industry association (not a statutory regulator — cannot impose legal penalties). RBI regulates banks and foreign exchange aspects.",
+forms:[
+  {q:"The primary regulator of mutual funds in India is ________.",
+   o:["Reserve Bank of India (RBI)","AMFI (Association of Mutual Funds in India)","Ministry of Finance","SEBI (Securities and Exchange Board of India)"],a:3},
+  {q:"AMFI differs from SEBI in that AMFI is ________ while SEBI is ________.",
+   o:["A statutory body; an industry association","An industry association; a statutory regulator with enforcement powers","A government ministry; a private body","A fund rating agency; a fund regulator"],a:1},
+  {q:"Which organisation can take LEGAL regulatory action against an AMC for violations?",
+   o:["AMFI","Trustees","SEBI","Ministry of Finance"],a:2}
+]},
+
+{ch:10,d:2,topic:"SCORES Platform",
+exp:"SCORES = SEBI Complaint Redress System. SEBI's online platform where investors file complaints against registered intermediaries (AMCs, brokers, etc.). Process: file complaint with AMC first → if unresolved → escalate to SCORES. SEBI monitors resolution timelines. Provides investors a structured escalation path beyond the AMC.",
+forms:[
+  {q:"SEBI's SCORES platform is used by investors to ________.",
+   o:["Check their credit score","File and track complaints against SEBI-registered entities","Register for NISM certification exams","Check mutual fund NAVs"],a:1},
+  {q:"An investor's complaint is unresolved by the AMC. The next escalation step is ________.",
+   o:["Go to court directly","File a complaint on SEBI's SCORES platform","Write to AMFI","Contact the fund manager personally"],a:1},
+  {q:"SCORES stands for ________.",
+   o:["SEBI Credit Online Rating and Evaluation System","SEBI Complaint Redress System","Securities Complaint Online Registration and Exchange System","Standard Complaints Oversight and Regulatory Escalation System"],a:1}
+]},
+
+{ch:10,d:3,topic:"Scheme Categorisation",
+exp:"SEBI's categorisation: one scheme per category per AMC to prevent proliferation of similar schemes. Exceptions (can have multiple): Sector/Thematic funds (each sector = different fund), Index funds (each index = different fund), Fund-of-Funds (different underlying assets). This is why you see multiple Nifty/Sensex index funds per AMC but only one large-cap equity fund.",
+forms:[
+  {q:"SEBI allows one AMC to have multiple schemes in which categories?",
+   o:["Equity and debt only","Sector/Thematic funds, Index funds, and Fund-of-Funds","Hybrid and balanced funds","Liquid and overnight funds"],a:1},
+  {q:"An AMC already has a large-cap equity fund. Can it launch another large-cap equity fund?",
+   o:["Yes, if it has different fund managers","Yes, if SEBI approves a second one","No, only one scheme per category per AMC","Yes, but only with a different name"],a:2},
+  {q:"SEBI's scheme categorisation rule primarily serves to ________.",
+   o:["Limit the total number of AMCs in India","Prevent proliferation of similar schemes and ensure uniformity for investor comparison","Increase SEBI's revenue from scheme approvals","Restrict foreign-owned AMCs"],a:1}
+]},
+
+{ch:10,d:4,topic:"Mis-selling",
+exp:"Mis-selling = recommending unsuitable products to earn higher commission, against investor's interest. SEBI prohibits this. AMCs must monitor distributors showing patterns of: high churning, concentration in high-commission products, mismatched risk profiling. Principle: suitability ALWAYS before commission. Distributors are required to assess investor's risk profile before recommending schemes.",
+forms:[
+  {q:"Which BEST describes mis-selling by a mutual fund distributor?",
+   o:["Recommending a lower-commission scheme matching investor's risk profile","Recommending a high-risk equity fund to a 68-year-old seeking capital safety, purely for higher commission","Explaining both pros and cons of a scheme honestly","Suggesting SIP to a young first-time investor"],a:1},
+  {q:"SEBI monitors distributors for 'churning'. Churning means ________.",
+   o:["Correctly diversifying investor portfolios across schemes","Frequently switching investors between schemes to generate new commissions","Managing multiple client accounts simultaneously","Recommending SIPs over lump sum investments"],a:1},
+  {q:"A distributor must assess a client's ________ before recommending mutual fund schemes.",
+   o:["Bank balance and income","Risk profile (risk tolerance, investment horizon, financial goals)","Number of dependents","CIBIL credit score"],a:1}
+]},
+
+{ch:10,d:5,topic:"Nomination Rules 2025",
+exp:"SEBI's revised nomination circular (effective March 1, 2025): single-holder folios must either (a) make a nomination OR (b) submit a signed declaration opting out. Simply leaving the nomination section blank is NOT acceptable from March 2025 onwards. This protects legal heirs and nominees. Joint folios have different rules. Specifically called out in the November 2025 VB workbook.",
+forms:[
+  {q:"From March 1, 2025, a single-holder MF folio MUST either have a nomination OR ________.",
+   o:["Pay a nomination fee to the AMC","Submit a signed declaration explicitly opting out of nomination","Get SEBI's approval to skip nomination","Remain frozen until nomination is done"],a:1},
+  {q:"Before SEBI's March 2025 circular, what happened when an investor left the nomination section blank?",
+   o:["The folio was rejected","The folio was considered to have no nomination (which is now not acceptable for single-holder folios)","The AMC automatically nominated the investor's spouse","The investment was returned"],a:1},
+  {q:"The purpose of SEBI's 2025 nomination mandate for single-holder folios is to ________.",
+   o:["Generate fee revenue for AMCs","Ensure legal heirs and nominees can smoothly claim assets after investor's death","Reduce paperwork at AMCs","Comply with RBI's KYC guidelines"],a:1}
+]}
+]; // END QB
+
+// ────────────────────────────────────────────────────────────────
+// SIMPLE HASH (for password storage in localStorage)
+// ────────────────────────────────────────────────────────────────
+function hashPw(pw) {
+  let h = 0x811c9dc5;
+  for (let i=0; i<pw.length; i++) {
+    h ^= pw.charCodeAt(i);
+    h = (h * 0x01000193) >>> 0;
+  }
+  return h.toString(36) + pw.length;
+}
+
+// ────────────────────────────────────────────────────────────────
+// DATABASE (localStorage)
+// ────────────────────────────────────────────────────────────────
+const DB_KEY      = 'mfd_users';
+const PROG_KEY    = uid => 'mfd_prog_' + uid;
+const CURR_KEY    = 'mfd_curr';
+
+function loadUsers() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
+  catch { return []; }
+}
+function saveUsers(users) {
+  localStorage.setItem(DB_KEY, JSON.stringify(users));
+}
+function loadProg(uid) {
+  try { return JSON.parse(localStorage.getItem(PROG_KEY(uid)) || 'null'); }
+  catch { return null; }
+}
+function saveProg(uid, p) {
+  localStorage.setItem(PROG_KEY(uid), JSON.stringify(p));
+}
+function getCurrentUid() { return localStorage.getItem(CURR_KEY) || null; }
+function setCurrentUid(uid) {
+  if (uid) localStorage.setItem(CURR_KEY, uid);
+  else localStorage.removeItem(CURR_KEY);
+}
+
+function newProgress() {
+  return {
+    level:1, totalCorrect:0, totalAttempted:0,
+    sessions:0, bestStreak:0, globalPos:0,
+    chapterStats:{},          // {ch: {correct, total}}
+    qStates:{},               // {qIdx: {shown, correct, formHistory:[]}}
+    scheduled:{},             // {futurePos: [{qIdx, formIdx}]}
+    freshPool: shuffleArr(QB.map((_,i)=>i)),
+    cc:0, cw:0
+  };
+}
+
+function initAdminIfNeeded() {
+  const users = loadUsers();
+  if (!users.find(u => u.email === ADMIN_EMAIL)) {
+    const admin = {
+      id: 'admin_' + Date.now(),
+      name: ADMIN_NAME,
+      email: ADMIN_EMAIL,
+      pwHash: hashPw(ADMIN_PW),
+      status: 'approved',
+      regId: 'ADMIN',
+      note: 'Host / Administrator',
+      createdAt: Date.now()
+    };
+    users.push(admin);
+    saveUsers(users);
+  }
+}
+
+// ────────────────────────────────────────────────────────────────
+// CURRENT SESSION STATE
+// ────────────────────────────────────────────────────────────────
+let CU = null;   // current user object
+let CP = null;   // current user progress
+let SQ = {       // session-only counters (not persisted between sessions)
+  score:0, total:0, streak:0, bestStreak:0,
+  cc:0, cw:0, chErr:{}, chRight:{}
+};
+
+// ────────────────────────────────────────────────────────────────
+// AUTH
+// ────────────────────────────────────────────────────────────────
+function genId() {
+  return Math.random().toString(36).substr(2,4).toUpperCase()+'-'+
+         Math.random().toString(36).substr(2,4).toUpperCase();
+}
+
+function doRegister() {
+  const name  = eid('r-name').value.trim();
+  const email = eid('r-email').value.trim().toLowerCase();
+  const pw    = eid('r-pass').value;
+  const note  = eid('r-note').value.trim();
+  const err   = eid('auth-err');
+  const btn   = eid('btn-reg');
+
+  if (!name) return showErr(err,'Please enter your name.');
+  if (!email || !email.includes('@')) return showErr(err,'Enter a valid email.');
+  if (pw.length < 6) return showErr(err,'Password must be at least 6 characters.');
+
+  const users = loadUsers();
+  if (users.find(u => u.email === email)) return showErr(err,'This email is already registered. Sign in instead.');
+
+  const isAdmin = email === ADMIN_EMAIL;
+  const user = {
+    id: 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
+    name, email, pwHash: hashPw(pw),
+    status: isAdmin ? 'approved' : 'pending',
+    regId: isAdmin ? 'ADMIN' : genId(),
+    note, createdAt: Date.now()
+  };
+  users.push(user);
+  saveUsers(users);
+
+  // init progress
+  saveProg(user.id, newProgress());
+
+  btn.disabled = true; btn.textContent = 'Creating account...';
+  setTimeout(() => {
+    btn.disabled = false; btn.textContent = 'Request Access →';
+    setCurrentUid(user.id);
+    CU = user;
+    CP = loadProg(user.id);
+    routeUser(user);
+  }, 600);
+}
+
+function doLogin() {
+  const email = eid('l-email').value.trim().toLowerCase();
+  const pw    = eid('l-pass').value;
+  const err   = eid('auth-err');
+  const btn   = eid('btn-log');
+
+  if (!email || !pw) return showErr(err,'Enter email and password.');
+  const users = loadUsers();
+  const user  = users.find(u => u.email === email);
+  if (!user) return showErr(err,'No account found. Register first.');
+  if (user.pwHash !== hashPw(pw)) return showErr(err,'Incorrect password.');
+
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  setTimeout(() => {
+    btn.disabled = false; btn.textContent = 'Sign In →';
+    setCurrentUid(user.id);
+    CU = user;
+    CP = loadProg(user.id) || newProgress();
+    routeUser(user);
+  }, 500);
+}
+
+function doLogout() {
+  setCurrentUid(null); CU = null; CP = null;
+  showScreen('sc-auth');
+  eid('l-email').value = ''; eid('l-pass').value = '';
+  eid('btn-log').disabled = false; eid('btn-log').textContent = 'Sign In →';
+  hideErr(eid('auth-err'));
+}
+
+function routeUser(user) {
+  if (user.status === 'pending')   return showPending(user);
+  if (user.status === 'rejected')  return showScreen('sc-rejected');
+  if (user.status === 'approved')  return showDash();
+}
+
+function showPending(user) {
+  eid('pend-id').textContent = user.regId;
+  showScreen('sc-pending');
+  // Poll every 4 seconds for approval
+  const interval = setInterval(() => {
+    const users = loadUsers();
+    const latest = users.find(u => u.id === user.id);
+    if (latest && latest.status !== 'pending') {
+      clearInterval(interval);
+      CU = latest;
+      routeUser(latest);
+    }
+  }, 4000);
+}
+
+// ────────────────────────────────────────────────────────────────
+// DASHBOARD
+// ────────────────────────────────────────────────────────────────
+function showDash() {
+  const p = CP;
+  const firstName = (CU.name||'').split(' ')[0] || 'there';
+  eid('d-name').textContent = firstName;
+
+  const daysSince = p.lastSession ? Math.floor((Date.now()-p.lastSession)/86400000) : -1;
+  let greet = 'Welcome to Mutual Fund — Digest 📘';
+  if (p.sessions > 0 && daysSince === 0) greet = 'Great to see you again today! 💪';
+  else if (p.sessions > 0 && daysSince === 1) greet = 'Back after yesterday — keep it up! 🔥';
+  else if (p.sessions > 0 && daysSince > 1)  greet = `Welcome back! You were last here ${daysSince} days ago.`;
+  else if (p.sessions > 0) greet = 'Ready for another session? 📖';
+  eid('d-greet').textContent = greet;
+
+  const acc = p.totalAttempted > 0 ? Math.round(p.totalCorrect/p.totalAttempted*100)+'%' : '—';
+  eid('d-acc').textContent     = acc;
+  eid('d-lvl').textContent     = p.level || 1;
+  eid('d-streak').textContent  = p.bestStreak || 0;
+  eid('d-sessions').textContent= p.sessions || 0;
+
+  // Chapter bars
+  const hasCh = Object.keys(p.chapterStats||{}).length > 0;
+  eid('ch-bars-section').style.display = hasCh ? 'block' : 'none';
+  if (hasCh) {
+    const rows = [];
+    for (let i=1; i<=10; i++) {
+      const s = p.chapterStats[i];
+      if (!s || s.total === 0) continue;
+      const pct = Math.round(s.correct/s.total*100);
+      const col = pct>=70?'#16a34a':pct>=40?'#d97706':'#dc2626';
+      rows.push(`<div class="ch-row">
+        <span class="ch-name">Ch.${i}: ${CH_NAMES[i-1].split(' ').slice(0,2).join(' ')}</span>
+        <div class="ch-bar-bg"><div class="ch-bar" style="width:${pct}%;background:${col}"></div></div>
+        <span class="ch-pct" style="color:${col}">${pct}%</span>
+      </div>`);
+    }
+    eid('ch-bars').innerHTML = rows.join('');
+  }
+
+  // Admin button
+  eid('admin-btn').style.display = CU.email === ADMIN_EMAIL ? 'inline' : 'none';
+  showScreen('sc-dash');
+}
+
+// ────────────────────────────────────────────────────────────────
+// ADAPTIVE ENGINE
+// ────────────────────────────────────────────────────────────────
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+function getNextQ() {
+  const gp = CP.globalPos || 0;
+  // Check scheduled revisits
+  const sched = CP.scheduled || {};
+  if (sched[gp] && sched[gp].length > 0) {
+    const item = sched[gp].shift();
+    if (sched[gp].length === 0) delete sched[gp];
+    return { qIdx: item.qIdx, formIdx: item.formIdx, isRevisit: true };
+  }
+  // Fresh from pool
+  let pool = CP.freshPool || [];
+  if (pool.length === 0) {
+    // All questions shown at least once — pick least-shown
+    const sorted = QB.map((_,i)=>({i, shown:(CP.qStates[i]?.shown||0)}))
+                     .sort((a,b)=>a.shown-b.shown);
+    pool = sorted.map(x=>x.i);
+    CP.freshPool = pool;
+  }
+  // Weighted pick by chapter
+  const totalW = pool.reduce((s,i)=>s+CH_WEIGHT[QB[i].ch-1],0);
+  let r = Math.random()*totalW;
+  let qi = pool[pool.length-1];
+  for (const i of pool){ r-=CH_WEIGHT[QB[i].ch-1]; if(r<=0){qi=i;break;} }
+  // Remove from pool
+  CP.freshPool = pool.filter(x=>x!==qi);
+  return { qIdx: qi, formIdx: 0, isRevisit: false };
+}
+
+function scheduleRevisit(qIdx, wasCorrect) {
+  const qs = CP.qStates[qIdx] || {shown:0,correct:0,formHistory:[]};
+  // Pick next unused form
+  const totalForms = QB[qIdx].forms.length;
+  const used = qs.formHistory || [];
+  const unused = [0,1,2].filter(f => f<totalForms && !used.includes(f));
+  let nextForm = unused.length > 0 ? unused[Math.floor(Math.random()*unused.length)] : -1;
+
+  // If no unused forms → shuffle options of form 0
+  const gp = CP.globalPos || 0;
+  const delay = wasCorrect ? randInt(...REVISIT_GAP_CORRECT) : randInt(...REVISIT_GAP_WRONG);
+  const targetPos = String(gp + delay);
+
+  if (!CP.scheduled[targetPos]) CP.scheduled[targetPos] = [];
+  CP.scheduled[targetPos].push({ qIdx, formIdx: nextForm >= 0 ? nextForm : -1 });
+}
+
+function buildDisplayQ(qIdx, formIdx, isRevisit) {
+  const base = QB[qIdx];
+  let formData;
+
+  if (formIdx < 0 || formIdx >= base.forms.length) {
+    // Shuffle options of form 0
+    const f0 = {...base.forms[0], o:[...base.forms[0].o]};
+    const pairs = f0.o.map((opt,i)=>({opt, isAns: i===f0.a}));
+    for (let i=pairs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pairs[i],pairs[j]]=[pairs[j],pairs[i]];}
+    formData = { q: f0.q, o: pairs.map(p=>p.opt), a: pairs.findIndex(p=>p.isAns) };
+  } else {
+    formData = {...base.forms[formIdx]};
+  }
+
+  return {
+    ch: base.ch, d: base.d, topic: base.topic, exp: base.exp,
+    q: formData.q, o: formData.o, a: formData.a,
+    formIdx, isRevisit
+  };
+}
+
+// ────────────────────────────────────────────────────────────────
+// QUIZ SESSION
+// ────────────────────────────────────────────────────────────────
+let currentDQ = null;
+let questionAnswered = false;
+
+function startSession() {
+  CP = loadProg(CU.id) || newProgress();
+  SQ = { score:0, total:0, streak:0, bestStreak:0, cc:0, cw:0, chErr:{}, chRight:{} };
+  CP.sessions = (CP.sessions||0) + 1;
+  CP.lastSession = Date.now();
+  saveProg(CU.id, CP);
+  showScreen('sc-quiz');
+  eid('admin-btn-quiz') && (eid('admin-btn-quiz').style.display = CU.email===ADMIN_EMAIL?'inline':'none');
+  upQHeader();
+  loadNextQ();
+}
+
+function loadNextQ() {
+  questionAnswered = false;
+  kbFocusIdx = -1;  // reset keyboard highlight on every new question
+  const { qIdx, formIdx, isRevisit } = getNextQ();
+  currentDQ = buildDisplayQ(qIdx, formIdx, isRevisit);
+  currentDQ.qIdx = qIdx;
+
+  eid('q-ch-name').textContent = 'Ch.' + currentDQ.ch + ': ' + CH_NAMES[currentDQ.ch-1];
+
+  const diffClass = DIFF_CLASS[currentDQ.d] || 'pill-d2';
+  const diffLabel = DIFF_LABEL[currentDQ.d] || '';
+
+  eid('q-area').innerHTML = `
+    <div class="q-card">
+      <div class="q-meta">
+        <span class="pill pill-ch">Ch.${currentDQ.ch}</span>
+        <span class="pill ${diffClass}">${diffLabel}</span>
+        ${currentDQ.isRevisit ? '<span class="pill pill-rev">↩ Revisit</span>' : ''}
+        ${currentDQ.formIdx > 0 ? '<span class="pill pill-var">🔄 Variant</span>' : ''}
+        <span class="q-num">Q${SQ.total+1}/${MAX_Q_PER_SESSION}</span>
+      </div>
+      <div class="q-text">${currentDQ.q}</div>
+    </div>`;
+
+  const oa = eid('opts-area');
+  oa.style.display = 'flex';
+  oa.innerHTML = currentDQ.o.map((opt,i)=>
+    `<button class="opt" onclick="selectOpt(${i})" id="ob${i}">
+      <span class="opt-letter">${'ABCD'[i]}</span><span>${opt}</span>
+    </button>`).join('');
+
+  eid('exp-box').style.display = 'none';
+  eid('nxt-btn').style.display = 'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function selectOpt(idx) {
+  if (questionAnswered) return;
+  questionAnswered = true;
+  const correct = currentDQ.a;
+  const isRight = idx === correct;
+  const qIdx = currentDQ.qIdx;
+
+  // Style buttons
+  for (let i=0;i<4;i++){
+    const b=eid('ob'+i);if(!b)continue;
+    b.disabled=true;
+    if(i===correct) b.classList.add(isRight&&i===idx?'correct':'show-ans');
+    else if(i===idx&&!isRight) b.classList.add('wrong');
+  }
+
+  // Explanation
+  const eb = eid('exp-box');
+  eb.style.display='block';
+  eb.className = 'exp-box ' + (isRight?'ok':'no');
+  eb.innerHTML = `<div class="exp-head">${isRight?'✅ Correct!':'❌ Correct answer: '+'ABCD'[correct]}</div><div>${currentDQ.exp}</div>`;
+
+  // Update session counters
+  SQ.total++;
+  if(isRight){SQ.score++;SQ.streak++;SQ.cc++;SQ.cw=0;if(SQ.streak>SQ.bestStreak)SQ.bestStreak=SQ.streak;if(SQ.streak>=3&&SQ.streak%3===0)confetti();SQ.chRight[currentDQ.ch]=(SQ.chRight[currentDQ.ch]||0)+1;}
+  else{SQ.streak=0;SQ.cc=0;SQ.cw++;SQ.chErr[currentDQ.ch]=(SQ.chErr[currentDQ.ch]||0)+1;}
+
+  // Update progress (adaptive)
+  if(!CP.qStates[qIdx]) CP.qStates[qIdx]={shown:0,correct:0,formHistory:[]};
+  const qs = CP.qStates[qIdx];
+  qs.shown++;
+  if(isRight) qs.correct++;
+  if(!qs.formHistory.includes(currentDQ.formIdx)) qs.formHistory.push(currentDQ.formIdx);
+
+  // Level adaptation
+  if(isRight){CP.cc=(CP.cc||0)+1;CP.cw=0;if(CP.cc>=3&&CP.level<5){CP.level++;CP.cc=0;}}
+  else{CP.cw=(CP.cw||0)+1;CP.cc=0;if(CP.cw>=2&&CP.level>1){CP.level--;CP.cw=0;}}
+
+  // Schedule revisit
+  scheduleRevisit(qIdx, isRight);
+
+  // Update persistent progress
+  CP.globalPos = (CP.globalPos||0)+1;
+  CP.totalAttempted = (CP.totalAttempted||0)+1;
+  if(isRight) CP.totalCorrect=(CP.totalCorrect||0)+1;
+  if(!CP.bestStreak||SQ.bestStreak>CP.bestStreak) CP.bestStreak=SQ.bestStreak;
+
+  // Chapter stats
+  const ch=String(currentDQ.ch);
+  if(!CP.chapterStats[ch]) CP.chapterStats[ch]={correct:0,total:0};
+  CP.chapterStats[ch].total++;
+  if(isRight) CP.chapterStats[ch].correct++;
+
+  saveProg(CU.id, CP);
+  upQHeader();
+
+  const nb=eid('nxt-btn');nb.style.display='block';
+  nb.textContent = SQ.total>=MAX_Q_PER_SESSION?'See Results 🎓':'Next Question →';
+  setTimeout(()=>eb.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
+}
+
+function nextQ() {
+  if (SQ.total >= MAX_Q_PER_SESSION) { endSession(); return; }
+  loadNextQ();
+}
+
+function upQHeader() {
+  eid('q-score').textContent = SQ.score;
+  eid('q-total').textContent = SQ.total;
+  eid('q-streak').textContent = '🔥 '+SQ.streak;
+  eid('q-prog').style.width = (SQ.total/MAX_Q_PER_SESSION*100)+'%';
+
+  const dots=eid('lvl-dots');dots.innerHTML='';
+  for(let i=1;i<=5;i++){const d=document.createElement('div');d.className='lvl-dot';d.style.background=i<=CP.level?LVL_COLORS[CP.level-1]:'#e5e7eb';dots.appendChild(d);}
+  const ln=eid('lvl-name');ln.textContent=LVL_NAMES[CP.level-1];ln.style.color=LVL_COLORS[CP.level-1];
+}
+
+// ────────────────────────────────────────────────────────────────
+// END SESSION
+// ────────────────────────────────────────────────────────────────
+function endSession() {
+  const pct = SQ.total>0?Math.round(SQ.score/SQ.total*100):0;
+  eid('e-score').textContent = `${SQ.score}/${SQ.total}`;
+  eid('e-pct').textContent = pct>=80?`${pct}% — Excellent! Exam-ready 🏆`:pct>=60?`${pct}% — Good progress! Keep drilling 💪`:`${pct}% — Review the weak chapters 📚`;
+  eid('e-pct').style.color = pct>=80?'#14532d':pct>=60?'#92400e':'#7f1d1d';
+  eid('e-level').textContent = LVL_NAMES[CP.level-1].split(' ')[0];
+  eid('e-streak').textContent = SQ.bestStreak;
+  eid('e-sessions').textContent = CP.sessions;
+  const allAcc = CP.totalAttempted>0?Math.round(CP.totalCorrect/CP.totalAttempted*100)+'%':'—';
+  eid('e-all').textContent = allAcc;
+
+  const weak = Object.entries(SQ.chErr).filter(([,v])=>v>=2).sort((a,b)=>b[1]-a[1]).map(([c])=>`Ch.${c}: ${CH_NAMES[c-1]}`);
+  if(weak.length){eid('weak-note').style.display='block';eid('weak-list').textContent=weak.join(', ');}
+  else eid('weak-note').style.display='none';
+
+  showScreen('sc-end');
+  if(pct>=80) setTimeout(confetti,300);
+}
+
+// ────────────────────────────────────────────────────────────────
+// ADMIN PANEL
+// ────────────────────────────────────────────────────────────────
+let currentAdminTab = 'pending';
+
+function showAdminPrompt() {
+  const pw = prompt('Enter admin password to unlock panel:');
+  if (pw === ADMIN_PANEL_PW) { loadAdmin(); showScreen('sc-admin'); }
+  else if (pw !== null) alert('Incorrect password.');
+}
+
+function exitAdmin() { showDash(); }
+
+function adminTab(tab) {
+  currentAdminTab = tab;
+  ['pend','ok','all'].forEach((k,i)=>{
+    const names=['pending','approved','all'];
+    eid('at-'+k).classList.toggle('on',names[i]===tab);
+  });
+  renderAdminList();
+}
+
+function loadAdmin() {
+  const users = loadUsers();
+  const pend  = users.filter(u=>u.status==='pending').length;
+  const ok    = users.filter(u=>u.status==='approved').length;
+  eid('a-total').textContent = users.length;
+  eid('a-pend').textContent  = pend;
+  eid('a-ok').textContent    = ok;
+  eid('pend-dot').innerHTML  = pend>0?'<span class="notif-dot"></span>':'';
+  renderAdminList();
+}
+
+function renderAdminList() {
+  const users = loadUsers();
+  const filtered = currentAdminTab==='all'?users:users.filter(u=>u.status===currentAdminTab);
+  const list = eid('admin-list');
+  if(!filtered.length){list.innerHTML=`<div class="empty">No ${currentAdminTab} users.</div>`;return;}
+
+  list.innerHTML = filtered.map(u => {
+    const p = loadProg(u.id);
+    const acc = p&&p.totalAttempted>0?Math.round(p.totalCorrect/p.totalAttempted*100)+'%':'—';
+    const ts  = new Date(u.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    const lastS = p&&p.lastSession ? timeAgo(p.lastSession) : '—';
+    return `<div class="ucard">
+      <div class="uc-top">
+        <div>
+          <div class="uc-name">${u.name}</div>
+          <div class="uc-email">${u.email}</div>
+          <div class="uc-id">ID: ${u.regId}</div>
+          ${u.note?`<div class="uc-note">"${u.note}"</div>`:''}
+        </div>
+        <span class="uc-status st-${u.status}">${u.status}</span>
+      </div>
+      <div class="uc-stats">
+        <span class="uc-stat">📅 ${ts}</span>
+        <span class="uc-stat">👁 Last seen: ${lastS}</span>
+        ${p?`<span class="uc-stat">🎯 ${acc} accuracy</span>`:''}
+        ${p?`<span class="uc-stat">📚 ${p.sessions||0} sessions</span>`:''}
+        ${p?`<span class="uc-stat">⚡ Level ${p.level||1}</span>`:''}
+        ${p?`<span class="uc-stat">🔥 Streak ${p.bestStreak||0}</span>`:''}
+      </div>
+      <div class="uc-btns">
+        ${u.status!=='approved'?`<button class="uc-btn uc-btn-ok" onclick="updateStatus('${u.id}','approved')">✓ Approve</button>`:''}
+        ${u.status!=='rejected'?`<button class="uc-btn uc-btn-no" onclick="updateStatus('${u.id}','rejected')">✕ Reject</button>`:''}
+        ${u.status==='approved'&&u.email!==ADMIN_EMAIL?`<button class="uc-btn uc-btn-rev" onclick="updateStatus('${u.id}','pending')">↩ Revoke</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStatus(uid, status) {
+  const users = loadUsers();
+  const u = users.find(u=>u.id===uid);
+  if(u) u.status = status;
+  saveUsers(users);
+  loadAdmin();
+}
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60)return 'just now';if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';
+}
+
+// ────────────────────────────────────────────────────────────────
+// CONFETTI
+// ────────────────────────────────────────────────────────────────
+function confetti() {
+  const cols=['#2563eb','#059669','#d97706','#7c3aed','#dc2626','#0891b2'];
+  const w=eid('cf-wrap');
+  for(let i=0;i<42;i++){const p=document.createElement('div');p.className='cp';p.style.left=Math.random()*100+'vw';p.style.top='-12px';p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.transform='rotate('+Math.random()*360+'deg)';p.style.animationDelay=Math.random()*.5+'s';p.style.animationDuration=(1.2+Math.random()*.8)+'s';w.appendChild(p);setTimeout(()=>p.remove(),2800);}
+}
+
+// ────────────────────────────────────────────────────────────────
+// UI HELPERS
+// ────────────────────────────────────────────────────────────────
+function eid(id){return document.getElementById(id);}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));eid(id)&&eid(id).classList.add('on');}
+function showErr(el,msg){el.textContent=msg;el.style.display='block';}
+function hideErr(el){el.style.display='none';}
+
+function switchTab(tab) {
+  eid('form-reg').style.display  = tab==='reg'?'block':'none';
+  eid('form-log').style.display  = tab==='log'?'block':'none';
+  eid('tab-reg').classList.toggle('on',tab==='reg');
+  eid('tab-log').classList.toggle('on',tab==='log');
+  hideErr(eid('auth-err'));
+}
+
+// ────────────────────────────────────────────────────────────────
+// KEYBOARD SUPPORT (desktop)
+// ────────────────────────────────────────────────────────────────
+let kbFocusIdx = -1; // currently keyboard-focused option index
+
+function kbSetFocus(idx) {
+  const opts = document.querySelectorAll('#opts-area .opt:not(:disabled)');
+  if (!opts.length) return;
+  const total = currentDQ ? currentDQ.o.length : opts.length;
+  idx = ((idx % total) + total) % total;
+  kbFocusIdx = idx;
+  // Remove ring from all, add to focused
+  for (let i = 0; i < total; i++) {
+    const b = eid('ob' + i);
+    if (!b) continue;
+    b.style.outline = (i === idx) ? '3px solid #2563eb' : '';
+    b.style.outlineOffset = (i === idx) ? '2px' : '';
+  }
+}
+
+function kbClearFocus() {
+  if (!currentDQ) return;
+  for (let i = 0; i < currentDQ.o.length; i++) {
+    const b = eid('ob' + i);
+    if (b) { b.style.outline = ''; b.style.outlineOffset = ''; }
+  }
+  kbFocusIdx = -1;
+}
+
+document.addEventListener('keydown', function(e) {
+  // Only when quiz screen is active
+  const quizScreen = eid('sc-quiz');
+  if (!quizScreen || !quizScreen.classList.contains('on')) return;
+
+  // Don't hijack if user is typing in an input
+  const tag = document.activeElement && document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+  const key = e.key;
+
+  // ── Option selection: A/B/C/D or 1/2/3/4 ──
+  const letterMap = { a: 0, b: 1, c: 2, d: 3 };
+  const numMap    = { '1': 0, '2': 1, '3': 2, '4': 3 };
+  const lk = key.toLowerCase();
+
+  if (!questionAnswered && (letterMap[lk] !== undefined || numMap[key] !== undefined)) {
+    e.preventDefault();
+    const idx = letterMap[lk] !== undefined ? letterMap[lk] : numMap[key];
+    if (currentDQ && idx < currentDQ.o.length) {
+      kbClearFocus();
+      selectOpt(idx);
+    }
+    return;
+  }
+
+  // ── Arrow keys: navigate options (before answering) ──
+  if (!questionAnswered && (key === 'ArrowDown' || key === 'ArrowRight')) {
+    e.preventDefault();
+    const total = currentDQ ? currentDQ.o.length : 4;
+    kbSetFocus(kbFocusIdx < 0 ? 0 : kbFocusIdx + 1);
+    return;
+  }
+  if (!questionAnswered && (key === 'ArrowUp' || key === 'ArrowLeft')) {
+    e.preventDefault();
+    const total = currentDQ ? currentDQ.o.length : 4;
+    kbSetFocus(kbFocusIdx < 0 ? total - 1 : kbFocusIdx - 1);
+    return;
+  }
+
+  // ── Enter / Space: confirm highlighted option OR go next ──
+  if (key === 'Enter' || key === ' ') {
+    e.preventDefault();
+    if (!questionAnswered) {
+      // Confirm arrow-navigated selection
+      if (kbFocusIdx >= 0 && currentDQ && kbFocusIdx < currentDQ.o.length) {
+        kbClearFocus();
+        selectOpt(kbFocusIdx);
+      }
+    } else {
+      // Advance to next question
+      const nb = eid('nxt-btn');
+      if (nb && nb.style.display !== 'none') nextQ();
+    }
+    return;
+  }
+
+  // ── Backspace/Escape: back to dashboard (only before answering) ──
+  if ((key === 'Backspace' || key === 'Escape') && !questionAnswered) {
+    e.preventDefault();
+    showDash();
+  }
+});
+
+// Clear kb focus when a new question loads (patch into loadNextQ)
+const _origLoadNextQ = loadNextQ;
+// Reset focus state each time loadNextQ is called
+const _patchLoadNextQ = function() { kbFocusIdx = -1; };
+const _loadNextQOrig = window.loadNextQ;
+
+// ────────────────────────────────────────────────────────────────
+// BOOT
+// ────────────────────────────────────────────────────────────────
+(function boot() {
+  initAdminIfNeeded();
+  const uid = getCurrentUid();
+  if (uid) {
+    const users = loadUsers();
+    const user  = users.find(u=>u.id===uid);
+    if (user) {
+      CU = user;
+      CP = loadProg(uid) || newProgress();
+      routeUser(user);
+      return;
+    }
+  }
+  showScreen('sc-auth');
+})();
+</script>
+</body>
+</html>
