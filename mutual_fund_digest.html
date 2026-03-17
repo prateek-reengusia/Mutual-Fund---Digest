@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mutual Fund — Digest</title>
+<title>Mutual Fund - Digest</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0ede8;min-height:100vh;display:flex;justify-content:center;padding:20px 16px}
@@ -195,7 +195,6 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
 .pt-v{font-size:17px;font-weight:800;color:#1a1a18}
 .pt-l{font-size:10px;color:#888780;margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 <!-- ═══ GLOBAL NAV ════════════════════════════════════════════════ -->
@@ -214,8 +213,7 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
       
       <!-- DROPDOWN -->
       <div class="nav-dropdown" id="nav-dropdown-menu">
-        <button class="nav-drop-item" id="nav-drop-admin" style="display:none" onclick="toggleNavDropdown();showAdminPrompt()">⚙ Admin Panel</button>
-        <button class="nav-drop-item danger" onclick="toggleNavDropdown();doLogout()">Sign Out</button>
+        <button class="nav-drop-item danger" onclick="toggleNavDropdown();doLogout()">Reset Progress</button>
       </div>
     </div>
   </div>
@@ -228,63 +226,25 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
   <div class="card">
     <div class="logo">
       <div class="logo-mark">📘</div>
-      <div class="logo-title">Mutual Fund — Digest</div>
+      <div class="logo-title">Mutual Fund - Digest</div>
       <div class="logo-sub">Adaptive Learning Platform</div>
     </div>
     <div class="tabs">
-      <button class="tab on" id="tab-reg" onclick="switchTab('reg')">Create Account</button>
-      <button class="tab" id="tab-log" onclick="switchTab('log')">Sign In</button>
+      <button class="tab on" style="cursor:default">Get Started</button>
     </div>
     <div class="err on" id="auth-err" style="display:none"></div>
 
     <div id="form-reg">
-      <div class="field"><label>Full Name</label><input id="r-name" type="text" placeholder="Your full name"></div>
-      <div class="field"><label>Email</label><input id="r-email" type="email" placeholder="you@email.com"></div>
-      <div class="field"><label>Password</label><input id="r-pass" type="password" placeholder="Min 6 characters"></div>
-      <div class="field"><label>Why do you want access? <span style="font-weight:400;color:#b4b2a9">(optional)</span></label>
-        <input id="r-note" type="text" placeholder="e.g. Preparing for NISM exam"></div>
-      <button class="btn btn-blue" id="btn-reg" onclick="doRegister()">Request Access →</button>
-      <div class="switch-note">Already have an account? <a onclick="switchTab('log')">Sign in</a></div>
-    </div>
-
-    <div id="form-log" style="display:none">
-      <div class="field"><label>Email</label><input id="l-email" type="email" placeholder="you@email.com"></div>
-      <div class="field"><label>Password</label><input id="l-pass" type="password" placeholder="Your password"></div>
-      <button class="btn btn-blue" id="btn-log" onclick="doLogin()">Sign In →</button>
-      <div class="switch-note">New here? <a onclick="switchTab('reg')">Create account</a></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ PENDING SCREEN ════════════════════════════════════════════ -->
-<div id="sc-pending" class="screen">
-  <div class="card">
-    <div class="status-wrap">
-      <span class="big-icon pulsing">⏳</span>
-      <div class="status-title">Waiting for Approval</div>
-      <div class="status-body">Your registration has been received. The host will review and approve your access. This page updates automatically — no need to refresh.</div>
-      <div class="id-box">
-        <div class="id-label">Your Registration ID</div>
-        <div class="id-value" id="pend-id">—</div>
+      <div style="font-size:12px;color:#888780;margin-bottom:18px;text-align:center;line-height:1.5;">
+        This model is hosted locally on your website cookies so data will not sync with device change.
       </div>
-      <div style="font-size:12px;color:#888780;margin-bottom:18px">Share this ID with the host to speed up approval.</div>
-      <div class="divider"></div>
-      <button class="btn btn-out" onclick="doLogout()" style="margin-top:10px">← Sign out</button>
+      <div class="field"><label>Full Name</label><input id="r-name" type="text" placeholder="Your full name" onkeydown="if(event.key==='Enter') doRegister()"></div>
+      <button class="btn btn-blue" id="btn-reg" onclick="doRegister()">Start Learning →</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ REJECTED SCREEN ══════════════════════════════════════════ -->
-<div id="sc-rejected" class="screen">
-  <div class="card">
-    <div class="status-wrap">
-      <span class="big-icon">🚫</span>
-      <div class="status-title">Access Not Granted</div>
-      <div class="status-body">Your access request was reviewed and not approved by the host.</div>
-      <button class="btn btn-out" onclick="doLogout()" style="margin-top:10px">Sign Out</button>
-    </div>
-  </div>
-</div>
+<!-- ═══ SCREENS REMOVED ════════════════════════════════════════════ -->
 
 <!-- ═══ DASHBOARD ════════════════════════════════════════════════ -->
 <div id="sc-dash" class="screen">
@@ -292,7 +252,7 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
     <div class="dash-header">
       <div>
         <div class="dash-name">👋 <span id="d-name">there</span></div>
-        <div class="dash-greet" id="d-greet">Welcome to Mutual Fund — Digest</div>
+        <div class="dash-greet" id="d-greet">Welcome to Mutual Fund - Digest</div>
       </div>
     </div>
     <div class="stat-grid">
@@ -313,7 +273,7 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
 <div id="sc-quiz" class="screen">
   <div class="qhdr">
     <div class="qhdr-l">
-      <div class="app-name">Mutual Fund — Digest</div>
+      <div class="app-name">Mutual Fund - Digest</div>
       <div class="q-chapter" id="q-ch-name">Chapter</div>
     </div>
     <div class="qhdr-r">
@@ -373,29 +333,14 @@ h2{font-size:19px;font-weight:800;color:#1a1a18;margin-bottom:6px}
   </div>
 </div>
 
-<!-- ═══ ADMIN SCREEN ═════════════════════════════════════════════ -->
-<div id="sc-admin" class="screen">
-  <div class="card">
-    <div class="admin-top">
-      <div class="admin-title">🛡️ Admin Panel</div>
-      <button class="btn btn-out" style="width:auto;padding:7px 14px;font-size:13px" onclick="exitAdmin()">← Back</button>
-    </div>
-    <div class="admin-sum">
-      <div class="asum-cell"><div class="asum-v" id="a-total">0</div><div class="asum-l">Total Users</div></div>
-      <div class="asum-cell"><div class="asum-v" id="a-pend" style="color:#92400e">0</div><div class="asum-l">Pending</div></div>
-      <div class="asum-cell"><div class="asum-v" id="a-ok" style="color:#14532d">0</div><div class="asum-l">Approved</div></div>
-    </div>
-    <div class="admin-tabs">
-      <button class="atab on" id="at-pend" onclick="adminTab('pending')">Pending <span id="pend-dot"></span></button>
-      <button class="atab" id="at-ok" onclick="adminTab('approved')">Approved</button>
-      <button class="atab" id="at-all" onclick="adminTab('all')">All</button>
-    </div>
-    <div id="admin-list"></div>
-  </div>
-</div>
+<!-- ═══ ADMIN SCREEN REMOVED ═════════════════════════════════════════════ -->
 
 </div><!-- end .wrap -->
 <div class="cf-wrap" id="cf-wrap"></div>
+
+<div style="position:fixed;bottom:10px;right:16px;font-size:11px;color:#888780;z-index:9999;font-weight:600;letter-spacing:0.3px;">
+  A Project by Prateek Reengusia
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════
      COMPLETE APPLICATION LOGIC
@@ -1028,87 +973,23 @@ forms:[
 ]; // END QB
 
 // ────────────────────────────────────────────────────────────────
-// SIMPLE HASH (for password storage in localStorage)
-// ────────────────────────────────────────────────────────────────
-function hashPw(pw) {
-  let h = 0x811c9dc5;
-  for (let i=0; i<pw.length; i++) {
-    h ^= pw.charCodeAt(i);
-    h = (h * 0x01000193) >>> 0;
-  }
-  return h.toString(36) + pw.length;
-}
-
-// ────────────────────────────────────────────────────────────────
-// SUPABASE
-// ────────────────────────────────────────────────────────────────
-const SUPA_URL = 'https://vucxdygzhjoocnhhupir.supabase.co';
-const SUPA_KEY = 'sb_publishable_uuPLZEuCa1Y7Rjiablk4Pg_KQigdqLQ';
-const supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-
-// ────────────────────────────────────────────────────────────────
-// DATABASE (Supabase + localStorage cache)
+// DATABASE (localStorage only)
 // ────────────────────────────────────────────────────────────────
 const CURR_KEY = 'mfd_curr';
 
-async function findUser(email) {
-  const { data } = await supa.from('users').select('*').eq('email', email).maybeSingle();
-  return data;
-}
-async function getUserById(id) {
-  const { data } = await supa.from('users').select('*').eq('id', id).maybeSingle();
-  return data;
-}
-async function createUser(user) {
-  const { data, error } = await supa.from('users').insert([user]).select().maybeSingle();
-  return { data, error };
-}
-async function updateUserStatus(id, status) {
-  const { error } = await supa.from('users').update({ status }).eq('id', id);
-  return !error;
-}
-async function getAllUsers() {
-  const { data } = await supa.from('users').select('*').order('created_at', { ascending: false });
-  return data || [];
+function loadProg(uid) {
+  try { return JSON.parse(localStorage.getItem('mfd_prog_' + uid) || 'null'); } 
+  catch { return null; }
 }
 
-let _progSaveTimer = null;
-async function loadProg(uid) {
-  try {
-    const { data } = await supa.from('progress').select('data').eq('user_id', uid).maybeSingle();
-    if (data && data.data) {
-      localStorage.setItem('mfd_prog_' + uid, JSON.stringify(data.data));
-      return data.data;
-    }
-  } catch(e) {}
-  try { return JSON.parse(localStorage.getItem('mfd_prog_' + uid) || 'null'); } catch { return null; }
-}
 function saveProg(uid, p) {
   localStorage.setItem('mfd_prog_' + uid, JSON.stringify(p));
-  clearTimeout(_progSaveTimer);
-  _progSaveTimer = setTimeout(async () => {
-    await supa.from('progress').upsert([{ user_id: uid, data: p, updated_at: new Date().toISOString() }]);
-  }, 500);
 }
+
 function getCurrentUid() { return localStorage.getItem(CURR_KEY) || null; }
 function setCurrentUid(uid) {
   if (uid) localStorage.setItem(CURR_KEY, uid);
   else localStorage.removeItem(CURR_KEY);
-}
-
-async function initAdminIfNeeded() {
-  const existing = await findUser(ADMIN_EMAIL);
-  const targetHash = hashPw(ADMIN_PW);
-  if (!existing) {
-    await createUser({
-      id: 'admin_' + Date.now(),
-      name: ADMIN_NAME, email: ADMIN_EMAIL, pw_hash: targetHash,
-      status: 'approved', reg_id: 'ADMIN', note: 'Host / Administrator',
-      created_at: Date.now()
-    });
-  } else if (existing.pw_hash !== targetHash) {
-    await supa.from('users').update({ pw_hash: targetHash }).eq('id', existing.id);
-  }
 }
 
 
@@ -1140,45 +1021,28 @@ function genId() {
          Math.random().toString(36).substr(2,4).toUpperCase();
 }
 
-async function doRegister() {
+function doRegister() {
   const name  = eid('r-name').value.trim();
-  const email = eid('r-email').value.trim().toLowerCase();
-  const pw    = eid('r-pass').value;
-  const note  = eid('r-note').value.trim();
   const err   = eid('auth-err');
-  const btn   = eid('btn-reg');
 
-  if (!name) return showErr(err,'Please enter your name.');
-  if (!email || !email.includes('@')) return showErr(err,'Enter a valid email.');
-  if (pw.length < 6) return showErr(err,'Password must be at least 6 characters.');
+  if (!name) return showErr(err,'Please enter your full name to start.');
 
-  btn.disabled = true; btn.textContent = 'Checking...';
-  
-  const existing = await findUser(email);
-  if (existing) {
-    btn.disabled = false; btn.textContent = 'Request Access →';
-    return showErr(err,'This email is already registered. Sign in instead.');
-  }
-
-  const isAdmin = email === ADMIN_EMAIL;
   const user = {
-    id: 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2,5),
-    name, email, pw_hash: hashPw(pw),
-    status: isAdmin ? 'approved' : 'pending',
-    reg_id: isAdmin ? 'ADMIN' : genId(),
-    note, created_at: Date.now()
+    id: 'local_' + genId(),
+    name: name,
+    status: 'approved',
+    created_at: Date.now()
   };
-  
-  btn.textContent = 'Creating account...';
-  await createUser(user);
+
+  // store in localStorage
+  localStorage.setItem('local_user_profile', JSON.stringify(user));
 
   // init progress
   saveProg(user.id, newProgress());
 
-  btn.disabled = false; btn.textContent = 'Request Access →';
   setCurrentUid(user.id);
   CU = user;
-  CP = await loadProg(user.id);
+  CP = loadProg(user.id);
   routeUser(user);
 }
 
@@ -1196,45 +1060,23 @@ document.addEventListener('click', (e) => {
 });
 
 function navToHome() {
-  // Gracefully handle leaving quiz
   if (currentScreen === 'sc-quiz') endSession();
   else showDash();
 }
 
-async function doLogin() {
-  const email = eid('l-email').value.trim().toLowerCase();
-  const pw    = eid('l-pass').value;
-  const err   = eid('auth-err');
-  const btn   = eid('btn-log');
-
-  if (!email || !pw) return showErr(err,'Enter email and password.');
-  
-  btn.disabled = true; btn.textContent = 'Signing in...';
-  const user = await findUser(email);
-  
-  if (!user) {
-    btn.disabled = false; btn.textContent = 'Sign In →';
-    return showErr(err,'No account found. Register first.');
-  }
-  if (user.pw_hash !== hashPw(pw)) {
-    btn.disabled = false; btn.textContent = 'Sign In →';
-    return showErr(err,'Incorrect password.');
-  }
-
-  setCurrentUid(user.id);
-  CU = user;
-  CP = await loadProg(user.id) || newProgress();
-  btn.disabled = false; btn.textContent = 'Sign In →';
-  routeUser(user);
-}
-
 function doLogout() {
-  setCurrentUid(null); CU = null; CP = null;
-  updateNav(null);
-  showScreen('sc-auth');
-  eid('l-email').value = ''; eid('l-pass').value = '';
-  eid('btn-log').disabled = false; eid('btn-log').textContent = 'Sign In →';
-  hideErr(eid('auth-err'));
+  if (confirm("Resetting will delete your local progress. Are you sure?")) {
+    const uid = getCurrentUid();
+    if (uid) {
+      localStorage.removeItem('mfd_prog_' + uid);
+    }
+    localStorage.removeItem('local_user_profile');
+    setCurrentUid(null); CU = null; CP = null;
+    updateNav(null);
+    showScreen('sc-auth');
+    eid('r-name').value = '';
+    hideErr(eid('auth-err'));
+  }
 }
 
 function updateNav(user) {
@@ -1243,9 +1085,6 @@ function updateNav(user) {
     nav.classList.add('on');
     eid('nav-user-name').textContent = user.name.split(' ')[0] || 'User';
     eid('nav-avatar').textContent = (user.name.charAt(0) || 'U').toUpperCase();
-    const isAdmin = (user.email === ADMIN_EMAIL);
-    eid('nav-admin-btn').style.display = 'none'; // hide inline button
-    eid('nav-drop-admin').style.display = isAdmin ? 'block' : 'none'; // show in dropdown
   } else {
     nav.classList.remove('on');
   }
@@ -1253,30 +1092,7 @@ function updateNav(user) {
 
 function routeUser(user) {
   updateNav(user);
-  if (user.status === 'pending')   return showPending(user);
-  if (user.status === 'rejected')  return showScreen('sc-rejected');
   if (user.status === 'approved')  return showDash();
-}
-
-let _subPending = null;
-function showPending(user) {
-  eid('pend-id').textContent = user.reg_id;
-  showScreen('sc-pending');
-  
-  if (_subPending) supa.removeChannel(_subPending);
-  
-  // Real-time subscription for approval
-  _subPending = supa.channel('public:users:id=' + user.id)
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: 'id=eq.' + user.id }, payload => {
-      const latest = payload.new;
-      if (latest.status !== 'pending') {
-        supa.removeChannel(_subPending);
-        _subPending = null;
-        CU = latest;
-        routeUser(latest);
-      }
-    })
-    .subscribe();
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -1579,118 +1395,8 @@ function endSession() {
 }
 
 // ────────────────────────────────────────────────────────────────
-// ADMIN PANEL
+// ADMIN REMOVED
 // ────────────────────────────────────────────────────────────────
-let currentAdminTab = 'pending';
-let _adminSub = null;
-let _adminUsersCache = [];
-
-function showAdminPrompt() {
-  // If the logged in user is the admin email, no prompt needed
-  if (CU && CU.email === ADMIN_EMAIL) {
-    loadAdmin();
-    showScreen('sc-admin');
-    return;
-  }
-  
-  const pw = prompt('Enter admin password to unlock panel:');
-  if (pw === ADMIN_PANEL_PW) { loadAdmin(); showScreen('sc-admin'); }
-  else if (pw !== null) alert('Incorrect password.');
-}
-
-function exitAdmin() {
-  if (_adminSub) { supa.removeChannel(_adminSub); _adminSub = null; }
-  showDash();
-}
-
-function adminTab(tab) {
-  currentAdminTab = tab;
-  ['pend','ok','all'].forEach((k,i)=>{
-    const names=['pending','approved','all'];
-    eid('at-'+k).classList.toggle('on',names[i]===tab);
-  });
-  renderAdminList();
-}
-
-async function loadAdmin() {
-  // Initial load
-  _adminUsersCache = await getAllUsers();
-  updateAdminCounts();
-  renderAdminList();
-
-  // Real-time subscription for ANY user change (new user, status change)
-  if (!_adminSub) {
-    _adminSub = supa.channel('public:users:admin')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, async payload => {
-        // Refresh full list on any change to keep it simple and accurate
-        _adminUsersCache = await getAllUsers();
-        updateAdminCounts();
-        renderAdminList();
-      })
-      .subscribe();
-  }
-}
-
-function updateAdminCounts() {
-  const pend  = _adminUsersCache.filter(u=>u.status==='pending').length;
-  const ok    = _adminUsersCache.filter(u=>u.status==='approved').length;
-  eid('a-total').textContent = _adminUsersCache.length;
-  eid('a-pend').textContent  = pend;
-  eid('a-ok').textContent    = ok;
-  eid('pend-dot').innerHTML  = pend>0?'<span class="notif-dot"></span>':'';
-}
-
-function renderAdminList() {
-  const users = _adminUsersCache;
-  const filtered = currentAdminTab==='all'?users:users.filter(u=>u.status===currentAdminTab);
-  const list = eid('admin-list');
-  if(!filtered.length){list.innerHTML=`<div class="empty">No ${currentAdminTab} users.</div>`;return;}
-
-  // We can't synchronously load progress for all users here since loadProg is async now.
-  // For the admin panel, we'll just show the user details without their exact progress numbers,
-  // or we could fetch them cleanly. Since the prompt didn't ask to change the admin panel's data,
-  // we'll just render the user blocks.
-
-  list.innerHTML = filtered.map(u => {
-    const ts  = new Date(u.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-    return `<div class="ucard">
-      <div class="uc-top">
-        <div>
-          <div class="uc-name">${u.name}</div>
-          <div class="uc-email">${u.email}</div>
-          <div class="uc-id">ID: ${u.reg_id}</div>
-          ${u.note?`<div class="uc-note">"${u.note}"</div>`:''}
-        </div>
-        <span class="uc-status st-${u.status}">${u.status}</span>
-      </div>
-      <div class="uc-stats">
-        <span class="uc-stat">📅 ${ts}</span>
-      </div>
-      <div class="uc-btns">
-        ${u.status!=='approved'?`<button class="uc-btn uc-btn-ok" onclick="updateStatus('${u.id}','approved')">✓ Approve</button>`:''}
-        ${u.status!=='rejected'?`<button class="uc-btn uc-btn-no" onclick="updateStatus('${u.id}','rejected')">✕ Reject</button>`:''}
-        ${u.status==='approved'&&u.email!==ADMIN_EMAIL?`<button class="uc-btn uc-btn-rev" onclick="updateStatus('${u.id}','pending')">↩ Revoke</button>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function updateStatus(uid, status) {
-  // Optimistic UI update
-  const u = _adminUsersCache.find(x=>x.id===uid);
-  if(u) u.status = status;
-  updateAdminCounts();
-  renderAdminList();
-  
-  // Backend update
-  await updateUserStatus(uid, status);
-}
-
-function timeAgo(ts) {
-  const s = Math.floor((Date.now()-ts)/1000);
-  if(s<60)return 'just now';if(s<3600)return Math.floor(s/60)+'m ago';
-  if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';
-}
 
 // ────────────────────────────────────────────────────────────────
 // CONFETTI
@@ -1819,18 +1525,16 @@ const _loadNextQOrig = window.loadNextQ;
 // ────────────────────────────────────────────────────────────────
 // BOOT
 // ────────────────────────────────────────────────────────────────
-(async function boot() {
-  initAdminIfNeeded();
+(function boot() {
   const uid = getCurrentUid();
   if (uid) {
-    const user = await getUserById(uid);
-    if (user) {
-      CU = user;
-      CP = await loadProg(uid) || newProgress();
-      routeUser(user);
+    const storedUser = localStorage.getItem('local_user_profile');
+    if (storedUser) {
+      CU = JSON.parse(storedUser);
+      CP = loadProg(uid) || newProgress();
+      routeUser(CU);
       return;
     } else {
-      // invalid or deleted uid
       setCurrentUid(null);
     }
   }
