@@ -1088,13 +1088,16 @@ function setCurrentUid(uid) {
 
 async function initAdminIfNeeded() {
   const existing = await findUser(ADMIN_EMAIL);
+  const targetHash = hashPw(ADMIN_PW);
   if (!existing) {
     await createUser({
       id: 'admin_' + Date.now(),
-      name: ADMIN_NAME, email: ADMIN_EMAIL, pw_hash: hashPw(ADMIN_PW),
+      name: ADMIN_NAME, email: ADMIN_EMAIL, pw_hash: targetHash,
       status: 'approved', reg_id: 'ADMIN', note: 'Host / Administrator',
       created_at: Date.now()
     });
+  } else if (existing.pw_hash !== targetHash) {
+    await supa.from('users').update({ pw_hash: targetHash }).eq('id', existing.id);
   }
 }
 
